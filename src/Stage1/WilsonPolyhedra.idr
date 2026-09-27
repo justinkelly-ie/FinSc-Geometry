@@ -1,11 +1,11 @@
-module Math.WilsonPolyhedra
+module Stage1.WilsonPolyhedra
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Core.UnixelFraction
-import Math.QuantumTransition
-import Core
-import Geometry.LatticeTopology
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.UnixelFraction
+import Stage1.FourGeometries
+import Stage1.QuantumTransition
+import Stage0.LatticeTopology
 import Data.Vect
 import Data.List
 import Data.Fin

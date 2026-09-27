@@ -1,12 +1,12 @@
-module Math.LinAlgebra.TernaryClassifier
+module Stage1.LinAlgebra.TernaryClassifier
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Math.LinAlgebra.MetricTensor
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.LinAlgebra.MetricTensor
 import Data.Vect
-import public Core.NarayAlphabet
+import public Stage0.NarayAlphabet
 
-import Math.OnSeq.FusedStream
+import Stage0.OnSeq.FusedStream
 
 %default total
 
@@ -39,8 +39,8 @@ bitToInt = bit3ToInt
 
 ||| Converts a TernaryBit (Bit3) to a discrete BoxInt particle count.
 public export
-bitToBoxInt : TernaryBit -> Core.BoxInt.BoxInt
-bitToBoxInt b = Core.BoxInt.intToBoxInt (bit3ToInt b)
+bitToBoxInt : TernaryBit -> Stage0.BoxInt.BoxInt
+bitToBoxInt b = Stage0.BoxInt.intToBoxInt (bit3ToInt b)
 
 ------------------------------------------------------------------------
 -- 2. METRIC TENSOR CLASSIFICATION & DISCRIMINANTS
@@ -120,5 +120,5 @@ classifyVexelIndependence v1 v2 =
 public export
 auditGeometricVexelClassificationProof : Bool
 auditGeometricVexelClassificationProof =
-  (Core.BoxInt.intToBoxInt 1 == Core.BoxInt.intToBoxInt 1) &&
-  (Core.BoxInt.intToBoxInt 2 == Core.BoxInt.intToBoxInt 2)
+  (Stage0.BoxInt.intToBoxInt 1 == Stage0.BoxInt.intToBoxInt 1) &&
+  (Stage0.BoxInt.intToBoxInt 2 == Stage0.BoxInt.intToBoxInt 2)

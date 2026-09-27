@@ -1,26 +1,27 @@
 module Geometry
 
-import public Core.CosmicScaleTransform
-import public Geometry.Applicative
-import public Geometry.GrassmannCalculus
-import public Geometry.InformationGeometry
-import public Geometry.LatticeTopology
-import public Geometry.LatticeStream
-import public Geometry.MetricalBounds
-import public Geometry.MonadicMetricSpace
-import public Math.ChromoCategory
-import public Math.CliffordAlgebra
-import public Math.ExclusionPrinciple
-import public Math.FourGeometries
-import public Math.LinAlgebra.BilinearProduct
-import public Math.LinAlgebra.MetricTensor
-import public Math.LinAlgebra.TernaryClassifier
-import public Math.MotivicProof
-import public Math.MultisetMetricTensor55
-import public Math.QuantumTransition
-import public Math.RationalTrig
-import public Math.SubstrateMetricTensor55
-import public Math.SpatialProjection
-import public Math.WilsonPolyhedra
+import public Stage0.Applicative
+import public Stage0.CosmicScaleTransform
+import public Stage0.LatticeStream
+import public Stage0.LatticeTopology
+
+import public Stage1.ChromoCategory
+import public Stage1.CliffordAlgebra
+import public Stage1.ExclusionPrinciple
+import public Stage1.FourGeometriesActions
+import public Stage1.GrassmannCalculus
+import public Stage1.InformationGeometry
+import public Stage1.LinAlgebra.BilinearProduct
+import public Stage1.LinAlgebra.MetricTensor
+import public Stage1.LinAlgebra.TernaryClassifier
+import public Stage1.MetricalBounds
+import public Stage1.MonadicMetricSpace
+import public Stage1.MotivicProof
+import public Stage1.MultisetMetricTensor55
+import public Stage1.QuantumTransition
+import public Stage1.RationalTrig
+import public Stage1.SpatialProjection
+import public Stage1.SubstrateMetricTensor55
+import public Stage1.WilsonPolyhedra
 
 %default total

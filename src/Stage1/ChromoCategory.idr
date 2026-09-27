@@ -1,8 +1,8 @@
-module Math.ChromoCategory
+module Stage1.ChromoCategory
 
-import public Core.BoxInt
-import public Core.VexelMaxel
-import public Math.LinAlgebra.MetricTensor
+import public Stage0.BoxInt
+import public Stage1.VexelMaxel
+import public Stage1.LinAlgebra.MetricTensor
 
 %default total
 

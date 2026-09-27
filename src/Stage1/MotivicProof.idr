@@ -1,10 +1,10 @@
-module Math.MotivicProof
+module Stage1.MotivicProof
 
 import Data.Vect
-import Core.BoxInt
-import Core.UnixelFraction
-import Core.Goh
-import Geometry.Applicative
+import Stage0.BoxInt
+import Stage1.UnixelFraction
+import Stage1.Goh
+import Stage0.Applicative
 
 %default total
 

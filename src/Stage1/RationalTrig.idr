@@ -1,12 +1,15 @@
-module Math.RationalTrig
+module Stage1.RationalTrig
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Core.Multiset
-import Core.UnixelFraction
-import Core.Polynumber
-import Math.LinAlgebra.MetricTensor
-import Core.TypeTheory.TwoLevel
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage0.Multiset
+import Stage1.UnixelFraction
+import Stage1.Polynumber
+import Stage1.LinAlgebra.MetricTensor
+import Stage1.TypeTheory.TwoLevel
+import Stage1.TypeTheory.Staging
+import Stage1.MultisetTree
+
 import Data.List
 
 %default total
@@ -303,6 +306,21 @@ auditQuadreaArchimedesPathProof =
       q2 = intToBoxInt 16
       q3 = intToBoxInt 25
   in quadrea q1 q2 q3 == quadreaMaxel q1 q2 q3
+
+------------------------------------------------------------------------
+-- 6. 2LTT STAGING CODE GENERATOR TRANSDUCER
+------------------------------------------------------------------------
+
+||| Staged 2LTT code generator for exact rational quadrea transducer.
+%inline public export
+stagedQuadrea : BoxInt -> BoxInt -> BoxInt -> Code BoxInt
+stagedQuadrea q1 q2 q3 = quote (quadrea q1 q2 q3)
+
+||| QTT 0 erased proof witness verifying quadrea staging inverse identity.
+public export
+0 prfStagedQuadrea : (q1, q2, q3 : BoxInt) -> splice (stagedQuadrea q1 q2 q3) = quadrea q1 q2 q3
+prfStagedQuadrea q1 q2 q3 = inverseSpliceQuote (quadrea q1 q2 q3)
+
 
 
 

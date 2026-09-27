@@ -1,10 +1,10 @@
-module Geometry.MetricalBounds
+module Stage1.MetricalBounds
 
 import Data.Vect
-import Core.UnixelFraction
-import Core.Goh
-import Core.Order.Preorder
-import Geometry.Applicative
+import Stage1.UnixelFraction
+import Stage1.Goh
+import Stage1.Order.Preorder
+import Stage0.Applicative
 
 %default total
 

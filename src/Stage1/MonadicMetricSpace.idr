@@ -1,12 +1,12 @@
-module Geometry.MonadicMetricSpace
+module Stage1.MonadicMetricSpace
 
 import Data.Vect
-import Core.BoxInt
-import Core.UnixelFraction
-import Core.Goh
-import Core.Order.Preorder
-import Geometry.Applicative
-import Geometry.MetricalBounds
+import Stage0.BoxInt
+import Stage1.UnixelFraction
+import Stage1.Goh
+import Stage1.Order.Preorder
+import Stage0.Applicative
+import Stage1.MetricalBounds
 
 %default total
 

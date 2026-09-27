@@ -1,7 +1,7 @@
-module Math.MultisetMetricTensor55
+module Stage1.MultisetMetricTensor55
 
-import Core.BoxInt
-import Core.Multiset
+import Stage0.BoxInt
+import Stage0.Multiset
 import Data.List
 import Data.Vect
 

@@ -1,7 +1,7 @@
-module Math.SubstrateMetricTensor55
+module Stage1.SubstrateMetricTensor55
 
-import Core.BoxInt
-import Core.VexelMaxel
+import Stage0.BoxInt
+import Stage1.VexelMaxel
 import Data.List
 import Data.Vect
 

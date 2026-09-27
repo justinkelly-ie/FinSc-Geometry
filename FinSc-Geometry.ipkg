@@ -1,5 +1,5 @@
 package FinSc-Geometry
-version = 0.3.2
+version = 0.3.3
 authors = "Justin Kelly"
 brief   = "Layer 3a Discrete Kinematics & Differential Geometry Subsystem."
 
@@ -7,27 +7,25 @@ depends = base, linear, FinSc-Multiset-Core, FinSc-Multiset-Transform, FinSc-Mul
 sourcedir = "src"
 
 modules = Geometry,
-          Core.CosmicScaleTransform,
-          Geometry.Applicative,
-          Geometry.GrassmannCalculus,
-          Geometry.InformationGeometry,
-          Geometry.LatticeTopology,
-          Geometry.LatticeStream,
-          Geometry.MetricalBounds,
-          Geometry.MonadicMetricSpace,
-          Math.ChromoCategory,
-          Math.CliffordAlgebra,
-          Math.ExclusionPrinciple,
-          Math.FourGeometries,
-
-          Math.LinAlgebra.BilinearProduct,
-          Math.LinAlgebra.MetricTensor,
-          Math.LinAlgebra.TernaryClassifier,
-          Math.MotivicProof,
-          Math.MultisetMetricTensor55,
-          Math.QuantumTransition,
-          Math.RationalTrig,
-          Math.SubstrateMetricTensor55,
-          Math.SpatialProjection,
-          Math.WilsonPolyhedra
-
+          Stage0.Applicative,
+          Stage0.CosmicScaleTransform,
+          Stage0.LatticeStream,
+          Stage0.LatticeTopology,
+          Stage1.ChromoCategory,
+          Stage1.CliffordAlgebra,
+          Stage1.ExclusionPrinciple,
+          Stage1.FourGeometriesActions,
+          Stage1.GrassmannCalculus,
+          Stage1.InformationGeometry,
+          Stage1.LinAlgebra.BilinearProduct,
+          Stage1.LinAlgebra.MetricTensor,
+          Stage1.LinAlgebra.TernaryClassifier,
+          Stage1.MetricalBounds,
+          Stage1.MonadicMetricSpace,
+          Stage1.MotivicProof,
+          Stage1.MultisetMetricTensor55,
+          Stage1.QuantumTransition,
+          Stage1.RationalTrig,
+          Stage1.SpatialProjection,
+          Stage1.SubstrateMetricTensor55,
+          Stage1.WilsonPolyhedra

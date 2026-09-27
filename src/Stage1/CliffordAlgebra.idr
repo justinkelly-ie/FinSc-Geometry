@@ -1,8 +1,8 @@
-module Math.CliffordAlgebra
+module Stage1.CliffordAlgebra
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Math.LinAlgebra.BilinearProduct
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.LinAlgebra.BilinearProduct
 
 %default total
 

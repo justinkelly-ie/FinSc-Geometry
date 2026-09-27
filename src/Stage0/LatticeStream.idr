@@ -1,10 +1,10 @@
-module Geometry.LatticeStream
+module Stage0.LatticeStream
 
 import Data.List
 import Data.Fin
 import Data.Fuel
-import Math.OnSeq.FusedStream
-import Geometry.LatticeTopology
+import Stage0.OnSeq.FusedStream
+import Stage0.LatticeTopology
 
 %default total
 

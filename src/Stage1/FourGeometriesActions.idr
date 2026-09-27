@@ -1,17 +1,21 @@
-module Math.FourGeometries
+module Stage1.FourGeometriesActions
 
-import public Core.BoxInt
-import public Core.Order.Preorder
-import public Core.VexelMaxel
-import public Core.UnixelFraction
-import public Core.ScaleTransform
-import public Core.FourGeometries
-import public Math.LinAlgebra.MetricTensor
-import public Math.LinAlgebra.TernaryClassifier
-import Geometry.LatticeTopology
+import Stage0.OnSeq.FusedStream
+import Stage0.LatticeTopology
+import Data.Fuel
 import Data.Fin
+import public Stage0.BoxInt
+import public Stage1.Order.Preorder
+import public Stage1.VexelMaxel
+import public Stage1.UnixelFraction
+import public Stage1.ScaleTransform
+import public Stage1.FourGeometries
+import public Stage1.LinAlgebra.MetricTensor
+import public Stage1.LinAlgebra.TernaryClassifier
 
 %default total
+
+
 
 ------------------------------------------------------------------------
 -- 2. CANONICAL MAXEL METRIC TENSORS
@@ -20,7 +24,7 @@ import Data.Fin
 ||| Maps each fundamental geometry to its canonical Maxel metric tensor.
 %inline
 public export
-geometryMetric : FundamentalGeometry -> Maxel
+geometryMetric : FundamentalGeometry -> Stage1.VexelMaxel.Maxel
 geometryMetric EllipticGeom   = gBlue
 geometryMetric HyperbolicGeom = gRed
 geometryMetric ParabolicGeom  = gBoole
@@ -29,20 +33,20 @@ geometryMetric SubstrateGeom  = gSubstrate
 ||| Computes the exact metric determinant for a fundamental geometry.
 %inline
 public export
-geometryDeterminant : FundamentalGeometry -> Core.BoxInt.BoxInt
+geometryDeterminant : FundamentalGeometry -> Stage0.BoxInt.BoxInt
 geometryDeterminant geom = detMetric (geometryMetric geom)
 
 ||| Computes the exact metric trace for a fundamental geometry.
 %inline
 public export
-geometryTrace : FundamentalGeometry -> Core.BoxInt.BoxInt
+geometryTrace : FundamentalGeometry -> Stage0.BoxInt.BoxInt
 geometryTrace geom = traceMetric (geometryMetric geom)
 
 ||| Evaluates the algebraic Quadrance Q_g(v) of a 2D Vexel under a fundamental geometry:
 ||| Q_g(v) = v1^2 * g11 + 2 * v1 * v2 * g12 + v2^2 * g22.
 %inline
 public export
-evaluateQuadrance : FundamentalGeometry -> (v1 : Core.BoxInt.BoxInt) -> (v2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+evaluateQuadrance : FundamentalGeometry -> (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 evaluateQuadrance geom v1 v2 =
   let g = geometryMetric geom
       g11Val = g11 g
@@ -62,52 +66,53 @@ evaluateQuadrance geom v1 v2 =
 ||| For any non-zero spatial displacement (1, 0), Q_Elliptic = +1 (strictly positive).
 %inline
 public export
-ellipticConfinementAction : (v1 : Core.BoxInt.BoxInt) -> (v2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+ellipticConfinementAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 ellipticConfinementAction v1 v2 = evaluateQuadrance EllipticGeom v1 v2
 
 ||| 2. Hyperbolic Action: Non-Abelian Quantum Phase & Lightcones.
 ||| Admits lightlike null vectors with zero quadrance (e.g. (1, 1) -> 1 - 1 = 0).
 %inline
 public export
-hyperbolicPhaseAction : (v1 : Core.BoxInt.BoxInt) -> (v2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+hyperbolicPhaseAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 hyperbolicPhaseAction v1 v2 = evaluateQuadrance HyperbolicGeom v1 v2
 
 ||| 3. Parabolic Action: Degenerate Dissipation Channel.
 ||| Disregards orthogonal direction components (g22 = 0, g12 = 0) allowing remainder drainage.
 %inline
 public export
-parabolicDissipationAction : (v1 : Core.BoxInt.BoxInt) -> (v2 : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+parabolicDissipationAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 parabolicDissipationAction v1 v2 = evaluateQuadrance ParabolicGeom v1 v2
 
 ||| 4. Substrate Action: Irreversible Causal Arrow.
 ||| Satisfies g22 = 0 (no temporal feedback) and g12 = 1 (unidirectional matter bias).
 %inline
 public export
-substrateCausalArrowAction : Maxel -> Bool
+substrateCausalArrowAction : Stage1.VexelMaxel.Maxel -> Bool
 substrateCausalArrowAction g =
   unwrapBox (g22 g) == 0 && unwrapBox (g12 g) == 1
 
 public export
-substrateCausalArrowActionBit : Maxel -> Bit
+substrateCausalArrowActionBit : Stage1.VexelMaxel.Maxel -> Bit
 substrateCausalArrowActionBit g =
   if unwrapBox (g22 g) == 0 && unwrapBox (g12 g) == 1 then One else Zero
+
 
 ------------------------------------------------------------------------
 -- 4. COSMIC BUDGET DECOMPOSITION ACROSS THE 4 GEOMETRIES
 ------------------------------------------------------------------------
 
-||| Decomposes the 4th Primorial budget (210) across the Chromogeometric Triad and Substrate:
+||| Decomposes the 4th Primorial budget across the Chromogeometric Triad and Substrate:
 ||| - Elliptic Blue Sector     = 27  (3^3 Spacetime Lattice Basis)
 ||| - Hyperbolic Red Sector    = 128 (2^7 Symplectic Law ROM)
-||| - Parabolic Green Sector   = 55  (Accumulated Dark Matter Residue)
+||| - Parabolic Green Sector   = 55  (Accumulated Dark Matter Residue, T_10)
 ||| Total Budget = 27 + 128 + 55 = 210 = 2 * 3 * 5 * 7.
 %inline
 public export
 cosmicBudgetByGeometry : FundamentalGeometry -> Nat
-cosmicBudgetByGeometry EllipticGeom   = 27
-cosmicBudgetByGeometry HyperbolicGeom = 128
-cosmicBudgetByGeometry ParabolicGeom  = 55
-cosmicBudgetByGeometry SubstrateGeom  = 210
+cosmicBudgetByGeometry EllipticGeom   = ellipticLatticeCapacity
+cosmicBudgetByGeometry HyperbolicGeom = hyperbolicRomCapacity
+cosmicBudgetByGeometry ParabolicGeom  = darkMatterTriangularResidue
+cosmicBudgetByGeometry SubstrateGeom  = primorial210Budget
 
 ||| Evaluates the exact rational chance proportion of each geometry.
 %inline
@@ -117,7 +122,22 @@ cosmicChanceByGeometry geom =
   let tally = cosmicBudgetByGeometry geom
   in if geom == SubstrateGeom
        then unitUnixelFraction
-       else hehnerTallyToChance tally 210
+       else hehnerTallyToChance tally primorial210Budget
+
+||| Foundational Pythagorean bond coordinate (4, 3) in H2O geometry.
+public export
+pythagoreanBondCoordinate : (BoxInt, BoxInt)
+pythagoreanBondCoordinate = (intToBoxInt 4, intToBoxInt 3)
+
+||| Computes the tri-metric chromogeometric gate fingerprint (25, 7, 24) algebraically from (4, 3).
+public export
+chromogeometricGateFingerprint : (BoxInt, BoxInt, BoxInt)
+chromogeometricGateFingerprint =
+  let (x, y) = pythagoreanBondCoordinate
+      qE = (x * x) + (y * y)
+      qH = (x * x) - (y * y)
+      qP = intToBoxInt 2 * (x * y)
+  in (qE, qH, qP)
 
 ------------------------------------------------------------------------
 -- 5. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -195,7 +215,7 @@ MonomorphicQuadranceConservation b r g = natAdd b r = g
 
 ||| Constructive erased witness verifying that the chromogeometric triad (27 + 128 + 55) sums to 210.
 public export
-0 prfThreeFoldBudgetConservation : MonomorphicQuadranceConservation (27 + 128) 55 210
+0 prfThreeFoldBudgetConservation : MonomorphicQuadranceConservation (Stage1.FourGeometries.ellipticLatticeCapacity + Stage1.FourGeometries.hyperbolicRomCapacity) Stage1.FourGeometries.darkMatterTriangularResidue Stage1.FourGeometries.primorial210Budget
 prfThreeFoldBudgetConservation = Refl
 
 ||| Evaluates chromogeometric transformations equipped with an erased compile-time metricPrf witness.
@@ -252,4 +272,39 @@ auditThreeFoldChromogeometryProof =
                                            (intToBoxInt 4) (intToBoxInt 0)
                                            (intToBoxInt 0) (intToBoxInt 3)
   in t6Ok && t8Ok
+
+------------------------------------------------------------------------
+-- 7. DEFORESTED 3-METRIC CHROMOGEOMETRIC TRIAD TRANSDUCERS (PHASE 9)
+------------------------------------------------------------------------
+
+||| Single-pass stream transducer evaluating Blue Elliptic (Q_E), Red Hyperbolic (Q_H),
+||| and Green Parabolic (Q_P) quadrances concurrently for (x, y) grid coordinates.
+public export
+chromogeometricTriadTransducer : StreamTransducer (BoxInt, BoxInt) (BoxInt, BoxInt, BoxInt)
+chromogeometricTriadTransducer = MkTransducer step ()
+  where
+    step : () -> (BoxInt, BoxInt) -> Step () (BoxInt, BoxInt, BoxInt)
+    step () (x, y) =
+      let qE = (x * x) + (y * y)
+          qH = (x * x) - (y * y)
+          qP = intToBoxInt 2 * (x * y)
+      in Yield (qE, qH, qP) ()
+
+||| Applies single-pass chromogeometric triad transducer over a deforested stream of (x, y) coordinates.
+%inline public export
+streamChromogeometricTriad : FusedStream (BoxInt, BoxInt) -> FusedStream (BoxInt, BoxInt, BoxInt)
+streamChromogeometricTriad strm = transduceStream chromogeometricTriadTransducer strm
+
+||| Zero-heap deforested accumulator verifying Wildberger 3-metric quadrance identity Q_E^2 == Q_H^2 + Q_P^2
+||| across a stream of grid coordinates.
+public export covering
+fusedChromogeometricTriadIdentityCheck : Fuel -> FusedStream (BoxInt, BoxInt) -> Bool
+fusedChromogeometricTriadIdentityCheck fuel strm =
+  let (MkStream next seed) = streamChromogeometricTriad strm
+  in fusedHylomorphism fuel
+       next
+       (\(qE, qH, qP), acc => ((qE * qE) == ((qH * qH) + (qP * qP))) && acc)
+       True
+       seed
+
 

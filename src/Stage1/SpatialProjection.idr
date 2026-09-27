@@ -1,11 +1,19 @@
-module Math.SpatialProjection
+module Stage1.SpatialProjection
 
-import Math.OnSeq.FusedStream
-import Core.ScalePipeline.StreamAdjunction
+import public Stage0.OnSeq.FusedStream
+import public Stage0.ScalePipeline.StreamAdjunction
 import Data.List
 import Data.Fuel
 
 %default total
+
+||| Operator token for spatial stream projections.
+public export
+record MaxelOperator where
+  constructor MkMaxelOp
+  src : Int
+  tgt : Int
+  sec : GeometrySector
 
 ------------------------------------------------------------------------
 -- 1. TOTAL FUELED SPATIAL BOXEL GRID PROJECTION ON T^3
@@ -13,7 +21,7 @@ import Data.Fuel
 
 ||| Total Fuel-driven projection of Maxel stream onto 3D Boxel grid T^3.
 public export
-projectFueledMaxelStream : Fuel -> FusedStream Maxel -> Boxel -> StateTransition Boxel
+projectFueledMaxelStream : Fuel -> FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
 projectFueledMaxelStream Dry _ initialBoxel = pure initialBoxel
 projectFueledMaxelStream (More f) (MkStream {s} step s0) initialBoxel =
   go f s0 initialBoxel
@@ -23,13 +31,13 @@ projectFueledMaxelStream (More f) (MkStream {s} step s0) initialBoxel =
     go (More f') state b = case step state of
       Done => pure b
       Skip state' => go f' state' b
-      Yield (MkMaxel src tgt sec) state' =>
+      Yield (MkMaxelOp src tgt sec) state' =>
         let matrix = MkMatrix src tgt Pos Zero Zero Pos
         in driveSpatialUpdate sec matrix b >>= go f' state'
 
 ||| Default fuel-bounded Boxel Stream projection over T^3 canvas.
 public export
-projectMaxelStream : FusedStream Maxel -> Boxel -> StateTransition Boxel
+projectMaxelStream : FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
 projectMaxelStream strm b = projectFueledMaxelStream (limit 1000) strm b
 
 ------------------------------------------------------------------------

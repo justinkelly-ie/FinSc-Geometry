@@ -1,17 +1,17 @@
-module Geometry.LatticeTopology
+module Stage0.LatticeTopology
 
 import Language.Reflection
-import Math.Singleton.Bit
-import Core.BoxInt
-import Core.Order.Preorder
-import Core.ScaleTransform
-import Core.VexelMaxel
-import Math.LinAlgebra.TernaryClassifier
-import Core.NarayAlphabet
+import Stage0.Singleton.Bit
+import Stage0.BoxInt
+import Stage1.Order.Preorder
+import Stage1.ScaleTransform
+import Stage1.VexelMaxel
+import Stage1.LinAlgebra.TernaryClassifier
+import Stage0.NarayAlphabet
 import Data.Vect
 import Data.Fin
-import Core.Goh
-import Math.OnSeq.FusedStream
+import Stage1.Goh
+import Stage0.OnSeq.FusedStream
 import Data.Fuel
 
 %default total

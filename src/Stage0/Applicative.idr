@@ -1,10 +1,10 @@
-module Geometry.Applicative
+module Stage0.Applicative
 
 import Data.Vect
-import Core.BoxInt
-import Core.UnixelFraction
-import Core.Goh
-import Core.Order.Preorder
+import Stage0.BoxInt
+import Stage1.UnixelFraction
+import Stage1.Goh
+import Stage1.Order.Preorder
 
 %default total
 

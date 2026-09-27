@@ -1,8 +1,8 @@
-module Geometry.GrassmannCalculus
+module Stage1.GrassmannCalculus
 
-import Core.BoxInt
-import Core.Multiset
-import Core.VexelMaxel
+import Stage0.BoxInt
+import Stage0.Multiset
+import Stage1.VexelMaxel
 import Data.List
 import Data.Vect
 

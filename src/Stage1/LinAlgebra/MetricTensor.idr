@@ -1,7 +1,7 @@
-module Math.LinAlgebra.MetricTensor
+module Stage1.LinAlgebra.MetricTensor
 
-import public Core.BoxInt
-import public Core.VexelMaxel
+import public Stage0.BoxInt
+import public Stage1.VexelMaxel
 
 %default total
 

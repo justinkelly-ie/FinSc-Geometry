@@ -1,9 +1,8 @@
-module Math.ExclusionPrinciple
+module Stage1.ExclusionPrinciple
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Core.UnixelFraction
-import Core
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.UnixelFraction
 import Data.List
 
 %default total
@@ -29,9 +28,9 @@ Show FermionOccupancy where
   show Occupied = "Occupied(1)"
 
 public export
-occupancyToInt : FermionOccupancy -> Core.BoxInt.BoxInt
-occupancyToInt Vacant = Core.BoxInt.intToBoxInt 0
-occupancyToInt Occupied = Core.BoxInt.intToBoxInt 1
+occupancyToInt : FermionOccupancy -> Stage0.BoxInt.BoxInt
+occupancyToInt Vacant = Stage0.BoxInt.intToBoxInt 0
+occupancyToInt Occupied = Stage0.BoxInt.intToBoxInt 1
 
 ||| Attempts to add a fermion to a cell:
 ||| If Vacant -> Occupied (Success).
@@ -48,17 +47,17 @@ addFermion Occupied = (Occupied, False) -- Exclusion triggered!
 ||| Evaluates zero-temperature Fermi distribution:
 ||| n(E) = 1 if E <= E_Fermi, else 0.
 public export
-fermiDiracZeroTemp : (energy : Core.BoxInt.BoxInt) -> (eFermi : Core.BoxInt.BoxInt) -> Core.BoxInt.BoxInt
+fermiDiracZeroTemp : (energy : Stage0.BoxInt.BoxInt) -> (eFermi : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fermiDiracZeroTemp energy eFermi =
   if unwrapBox energy <= unwrapBox eFermi
-     then Core.BoxInt.intToBoxInt 1
-     else Core.BoxInt.intToBoxInt 0
+     then Stage0.BoxInt.intToBoxInt 1
+     else Stage0.BoxInt.intToBoxInt 0
 
 ||| Evaluates discrete Fermi-Dirac rational fraction at finite temperature drag parameter D:
 ||| n(E) = 1 / (1 + D) as a UnixelFraction.
 public export
 fermiDiracRational : (drag : Nat) -> UnixelFraction
-fermiDiracRational drag = MkUnixelFraction (Core.BoxInt.intToBoxInt 1) (MkUnixel (1 + drag))
+fermiDiracRational drag = MkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) (MkUnixel (1 + drag))
 
 ------------------------------------------------------------------------
 -- 3. CONSTRUCTIVE FORMAL AUDIT PROOFS
@@ -93,8 +92,8 @@ auditFermionicBinaryOccupancyProof =
 public export
 auditZeroTemperatureFermiSurfaceProof : Bool
 auditZeroTemperatureFermiSurfaceProof =
-  let ef = Core.BoxInt.intToBoxInt 50
-      nCore = fermiDiracZeroTemp (Core.BoxInt.intToBoxInt 30) ef
-      nOuter = fermiDiracZeroTemp (Core.BoxInt.intToBoxInt 70) ef
+  let ef = Stage0.BoxInt.intToBoxInt 50
+      nCore = fermiDiracZeroTemp (Stage0.BoxInt.intToBoxInt 30) ef
+      nOuter = fermiDiracZeroTemp (Stage0.BoxInt.intToBoxInt 70) ef
   in unwrapBox nCore == 1 &&
      unwrapBox nOuter == 0
