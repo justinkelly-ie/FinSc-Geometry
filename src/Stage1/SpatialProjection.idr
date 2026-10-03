@@ -1,7 +1,7 @@
 module Stage1.SpatialProjection
 
 import public Stage0.OnSeq.FusedStream
-import public Stage0.ScalePipeline.StreamAdjunction
+import public Stage1.ScalePipeline.StreamAdjunction
 import Data.List
 import Data.Fuel
 

@@ -25,7 +25,7 @@
 
 ### 3. `Geometry.GrassmannCalculus` & `Geometry.LatticeTopology`
 - **Discrete Exterior Algebra:** Wedge products ($\wedge$), interior product contraction, and Grassmannian cell complexes over discrete vector spaces.
-- **Lattice Topology:** Cell complex topological boundary chains enforcing discrete contour containment ($\partial^2 = 0$).
+- **Lattice Topology:** Discrete multiset cell boundaries enforcing contour containment ($\partial^2 = 0$).
 
 ### 4. `Geometry.InformationGeometry`
 - **Dual Flat Information Manifolds:** Amari dual connections ($\nabla, \nabla^*$), Fisher-Rao metric tensors, and Pythagorean theorem over information quadrance.
