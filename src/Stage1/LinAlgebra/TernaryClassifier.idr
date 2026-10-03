@@ -91,18 +91,32 @@ public export
 allBits : Vect 3 TernaryBit
 allBits = [MinusOne, ZeroBit, PlusOne]
 
-||| Deprecated: Use streamAll27States for allocation-free FusedStream processing.
+||| Anamorphic generator step function for 27 ternary state permutations.
 public export
-generateAll27States : List (TernaryBit, TernaryBit, TernaryBit, MetricTensor2D, MetricSignature)
-generateAll27States =
-  let bits = [MinusOne, ZeroBit, PlusOne]
-  in [ (b1, b2, b3, buildTernaryMetric b1 b2 b3, classifyTernaryMetric b1 b2 b3)
-     | b1 <- bits, b2 <- bits, b3 <- bits ]
+stepState27 : Nat -> Step Nat (TernaryBit, TernaryBit, TernaryBit, MetricTensor2D, MetricSignature)
+stepState27 k =
+  if k >= 27
+    then Done
+    else
+      let b1 = case (k `div` 9) `mod` 3 of
+                 0 => MinusOne
+                 1 => ZeroBit
+                 _ => PlusOne
+          b2 = case (k `div` 3) `mod` 3 of
+                 0 => MinusOne
+                 1 => ZeroBit
+                 _ => PlusOne
+          b3 = case k `mod` 3 of
+                 0 => MinusOne
+                 1 => ZeroBit
+                 _ => PlusOne
+      in Yield (b1, b2, b3, buildTernaryMetric b1 b2 b3, classifyTernaryMetric b1 b2 b3) (S k)
 
 ||| Deforested stream transducer producing all 27 ternary state permutations.
 public export
 streamAll27States : FusedStream (TernaryBit, TernaryBit, TernaryBit, MetricTensor2D, MetricSignature)
-streamAll27States = stream generateAll27States
+streamAll27States = unfoldStream stepState27 0
+
 
 ------------------------------------------------------------------------
 -- 3. NATURAL LINEAR INDEPENDENCE OF METRIC VECTORS (CH. 26)

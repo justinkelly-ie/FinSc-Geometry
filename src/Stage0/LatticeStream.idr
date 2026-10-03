@@ -12,20 +12,6 @@ import Stage0.LatticeTopology
 -- 1. DEFORESTED LATTICE STREAM GENERATION
 ------------------------------------------------------------------------
 
-||| Deprecated: Use unfoldLatticeCoords for allocation-free FusedStream Coord3D.
-public export
-allLatticeCoords : List Coord3D
-allLatticeCoords = map fin27ToCoord (allFin 27)
-  where
-    allFin : (n : Nat) -> List (Fin n)
-    allFin 0 = []
-    allFin (S k) = FZ :: map FS (allFin k)
-
-||| Creates a deforested stream of all 27 3D lattice coordinates.
-public export
-streamLatticeCoords : FusedStream Coord3D
-streamLatticeCoords = stream allLatticeCoords
-
 ||| Anamorphic generator step function for 27 lattice coordinates.
 public export
 stepFin27 : Nat -> Step Nat Coord3D
@@ -40,6 +26,17 @@ stepFin27 k =
 public export
 unfoldLatticeCoords : FusedStream Coord3D
 unfoldLatticeCoords = unfoldStream stepFin27 0
+
+||| Creates an allocation-free deforested stream of all 27 3D lattice coordinates.
+public export
+streamLatticeCoords : FusedStream Coord3D
+streamLatticeCoords = unfoldLatticeCoords
+
+||| Evaluated list of all 27 3D lattice coordinates.
+public export
+allLatticeCoords : List Coord3D
+allLatticeCoords = runFueledStream (limit 30) streamLatticeCoords
+
 
 ------------------------------------------------------------------------
 -- 2. STREAMED LATTICE TRANSFORMATIONS & PIPELINES
