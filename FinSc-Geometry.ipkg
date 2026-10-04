@@ -3,7 +3,7 @@ version = 0.3.3
 authors = "Justin Kelly"
 brief   = "Layer 3a Discrete Kinematics & Differential Geometry Subsystem."
 
-depends = base, linear, FinSc-Multiset, FinSc-Metric-Substrate, FinSc-Multiset-Transform, FinSc-Radix-Ternary, FinSc-Dihedron
+depends = base, linear, FinSc-Multiset, FinSc-Metric-Substrate, FinSc-Phase-Unfolding, FinSc-Radix-Ternary, FinSc-Dihedron
 sourcedir = "src"
 
 modules = Geometry,
