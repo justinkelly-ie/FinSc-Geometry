@@ -1,6 +1,7 @@
 module Stage1.SubstrateMetricTensor55
 
 import Stage0.BoxInt
+import Stage0.StructuralFuel
 import Stage1.VexelMaxel
 import Data.List
 import Data.Vect
@@ -34,7 +35,7 @@ metricComponentIndex55 10 10 = Stage1.FourGeometries.darkMatterTriangularResidue
 metricComponentIndex55 i j =
   let i1 = minus i 1
       i2 = minus i 2
-      halfProd = cast {to=Nat} (div (cast {to=Integer} (i1 * i2)) 2)
+      halfProd = half (i1 * i2)
       rowOffset = minus (i1 * 10) halfProd
   in rowOffset + minus j i + 1
 

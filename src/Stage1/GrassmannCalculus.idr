@@ -211,7 +211,7 @@ auditJacobiIdentityProof =
 public export
 verifyColorNeutralVoxelFlux : Vect 6 BoxInt -> Bool
 verifyColorNeutralVoxelFlux faceFluxes =
-  let totalFlux = sum (toList faceFluxes)
+  let totalFlux = foldl addBox (intToBoxInt 0) faceFluxes
   in unwrapBox totalFlux == 0
 
 ------------------------------------------------------------------------
@@ -223,8 +223,8 @@ verifyColorNeutralVoxelFlux faceFluxes =
 public export
 evaluateDiscretePoyntingConservation : Vect 6 BoxInt -> BoxInt -> Bool
 evaluateDiscretePoyntingConservation faceFluxes deltaU =
-  let totalBoundaryFlux = sum (toList faceFluxes)
-      netBalance = totalBoundaryFlux + deltaU
+  let totalBoundaryFlux = foldl addBox (intToBoxInt 0) faceFluxes
+      netBalance = addBox totalBoundaryFlux deltaU
   in unwrapBox netBalance == 0
 
 ||| Audits that a localized EM field packet conserves total energy (Boundary Flux + Delta U == 0).
