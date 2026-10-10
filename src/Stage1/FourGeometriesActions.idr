@@ -1,6 +1,7 @@
 module Stage1.FourGeometriesActions
 
 import Stage0.OnSeq.FusedStream
+import Stage0.StructuralFuel
 import Stage0.LatticeTopology
 import Data.Fuel
 import Data.Fin
@@ -181,7 +182,7 @@ auditFourGeometriesCosmicSynthesisProof =
       okEll = case unwrapBox qEll of
                 1 => True
                 _ => False
-      okTot = natEq bTotal 210
+      okTot = natEq bTotal primorial210Budget
   in okHyp && okEll && okTot
 
 ------------------------------------------------------------------------
@@ -296,15 +297,30 @@ streamChromogeometricTriad : FusedStream (BoxInt, BoxInt) -> FusedStream (BoxInt
 streamChromogeometricTriad strm = transduceStream chromogeometricTriadTransducer strm
 
 ||| Zero-heap deforested accumulator verifying Wildberger 3-metric quadrance identity Q_E^2 == Q_H^2 + Q_P^2
-||| across a stream of grid coordinates.
-public export covering
-fusedChromogeometricTriadIdentityCheck : Fuel -> FusedStream (BoxInt, BoxInt) -> Bool
-fusedChromogeometricTriadIdentityCheck fuel strm =
+||| across a stream of grid coordinates using total structural Nat fuel.
+public export
+fusedChromogeometricTriadIdentityCheckNat : (fuel : Nat) -> FusedStream (BoxInt, BoxInt) -> Bool
+fusedChromogeometricTriadIdentityCheckNat fuel strm =
   let (MkStream next seed) = streamChromogeometricTriad strm
-  in fusedHylomorphism fuel
+  in fusedHylomorphismNat fuel
        next
        (\(qE, qH, qP), acc => ((qE * qE) == ((qH * qH) + (qP * qP))) && acc)
        True
        seed
+
+||| Zero-heap deforested accumulator verifying Wildberger 3-metric quadrance identity Q_E^2 == Q_H^2 + Q_P^2
+||| across a stream of grid coordinates using BoxNat fuel.
+public export
+fusedChromogeometricTriadIdentityCheckBoxNat : BoxNat -> FusedStream (BoxInt, BoxInt) -> Bool
+fusedChromogeometricTriadIdentityCheckBoxNat bfuel strm =
+  fusedChromogeometricTriadIdentityCheckNat (boxNatToNat bfuel) strm
+
+||| Zero-heap deforested accumulator verifying Wildberger 3-metric quadrance identity Q_E^2 == Q_H^2 + Q_P^2
+||| across a stream of grid coordinates.
+public export
+fusedChromogeometricTriadIdentityCheck : Fuel -> FusedStream (BoxInt, BoxInt) -> Bool
+fusedChromogeometricTriadIdentityCheck (More f) strm =
+  fusedChromogeometricTriadIdentityCheckNat (boxNatToNat masterSubstrateGohFuel) strm
+fusedChromogeometricTriadIdentityCheck Dry _ = True
 
 

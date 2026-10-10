@@ -11,6 +11,7 @@ import Stage0.NarayAlphabet
 import Data.Vect
 import Data.Fin
 import Stage1.Goh
+import Stage0.StructuralFuel
 import Stage0.OnSeq.FusedStream
 import Data.Fuel
 
@@ -93,6 +94,16 @@ shiftTernaryBackward b = case addNaray (Naray3 b) (Naray3 Bit3MinusOne) of Naray
 ||| The 6 cardinal directions on the 3D lattice.
 public export
 data CardinalDir = DirEast | DirWest | DirNorth | DirSouth | DirUp | DirDown
+
+public export
+Eq CardinalDir where
+  DirEast  == DirEast  = True
+  DirWest  == DirWest  = True
+  DirNorth == DirNorth = True
+  DirSouth == DirSouth = True
+  DirUp    == DirUp    = True
+  DirDown  == DirDown  = True
+  _        == _        = False
 
 ||| Computes the adjacent face neighbor coordinate along a cardinal direction.
 public export
@@ -287,11 +298,11 @@ fusedLatticeStream startPos dirs =
     (startPos, dirs)
 
 ||| Audit witness verifying zero-allocation lattice stream spatial shift equivalence.
-public export covering
+public export
 auditFusedLatticeStreamProof : Bool
 auditFusedLatticeStreamProof =
   let c0 = MkCoord3D Bit3Zero Bit3Zero Bit3Zero
       dirs = [DirEast, DirNorth, DirUp]
       strm = fusedLatticeStream c0 dirs
-      res = runFueledStream (limit 10) strm
+      res = runFueledStreamNat (boxNatToNat (gohFuel (length dirs))) strm
   in length res == 3

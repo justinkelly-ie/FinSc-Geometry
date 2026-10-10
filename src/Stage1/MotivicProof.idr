@@ -5,6 +5,7 @@ import Stage0.BoxInt
 import Stage1.UnixelFraction
 import Stage1.Goh
 import Stage0.Applicative
+import Stage1.FourGeometries
 
 %default total
 
@@ -20,7 +21,7 @@ interface CosmicMotive (space : VexelSpace d c) where
 ||| Default trivial motive for any vexel space
 public export
 implementation {d : Nat} -> {c : MetricColor} -> {space : VexelSpace d c} -> CosmicMotive space where
-  computeEuler = intToBoxInt 210
+  computeEuler = natToBoxInt Stage1.FourGeometries.primorial210Budget
 
 ||| A physical transition function whose operational validity is strictly 
 ||| bound to the structural laws of a Cosmic Motive.

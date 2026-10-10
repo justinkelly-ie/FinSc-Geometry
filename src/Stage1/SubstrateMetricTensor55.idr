@@ -5,6 +5,8 @@ import Stage1.VexelMaxel
 import Data.List
 import Data.Vect
 
+import Stage1.FourGeometries
+
 %default total
 
 ------------------------------------------------------------------------
@@ -28,7 +30,7 @@ Eq PhaseBasis10 where
 public export
 metricComponentIndex55 : Nat -> Nat -> Nat
 metricComponentIndex55 1 1 = 1
-metricComponentIndex55 10 10 = 55
+metricComponentIndex55 10 10 = Stage1.FourGeometries.darkMatterTriangularResidue
 metricComponentIndex55 i j =
   let i1 = minus i 1
       i2 = minus i 2
@@ -44,14 +46,14 @@ metricComponentIndex55 i j =
 public export
 record SubstrateMetricTensor55 where
   constructor MkSubstrateMetricTensor55
-  components : Vect 55 BoxInt
+  components : Vect Stage1.FourGeometries.darkMatterTriangularResidue BoxInt
   determinant : BoxInt
 
 ||| Constructs the canonical 55-component Parabolic Substrate Metric Tensor where det(g) = 0.
 public export
 canonicalSubstrateMetric55 : SubstrateMetricTensor55
 canonicalSubstrateMetric55 = MkSubstrateMetricTensor55
-  (replicate 55 (intToBoxInt 1))
+  (replicate Stage1.FourGeometries.darkMatterTriangularResidue (intToBoxInt 1))
   (intToBoxInt 0)
 
 ------------------------------------------------------------------------
@@ -68,4 +70,9 @@ auditSubstrateMetricTensor55Proof : Bool
 auditSubstrateMetricTensor55Proof =
   (unwrapBox (determinant canonicalSubstrateMetric55) == 0) &&
   (metricComponentIndex55 1 1 == 1) &&
-  (metricComponentIndex55 10 10 == 55)
+  (metricComponentIndex55 10 10 == Stage1.FourGeometries.darkMatterTriangularResidue)
+
+||| Compile-time proof witness verifying that 10D phase space metric components match darkMatterTriangularResidue.
+public export
+0 prfSubstrateMetric55DimensionMatchesPhaseSpaceBasis : Stage1.FourGeometries.darkMatterTriangularResidue = 55
+prfSubstrateMetric55DimensionMatchesPhaseSpaceBasis = Refl

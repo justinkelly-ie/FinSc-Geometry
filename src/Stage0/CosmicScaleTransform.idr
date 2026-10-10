@@ -1,6 +1,7 @@
 module Stage0.CosmicScaleTransform
 
 import Stage0.BoxInt
+import Stage0.StructuralFuel
 import Stage1.ScaleTransform
 import Stage1.FourGeometriesActions
 import Stage0.NarayAlphabet
@@ -52,12 +53,25 @@ cosmicScaleTransducer = MkTransducer step ()
 streamCosmicScaleTransform : FusedStream Bit3 -> FusedStream Nat
 streamCosmicScaleTransform strm = transduceStream cosmicScaleTransducer strm
 
-||| Zero-heap fused hylomorphism accumulator summing molecular weight projections over a stream of Bit3 states.
-public export covering
-fusedCosmicScaleAccumulate : Fuel -> FusedStream Bit3 -> Nat
-fusedCosmicScaleAccumulate fuel strm =
+||| Zero-heap fused hylomorphism accumulator summing molecular weight projections over a stream of Bit3 states using total structural Nat fuel.
+public export
+fusedCosmicScaleAccumulateNat : (fuel : Nat) -> FusedStream Bit3 -> Nat
+fusedCosmicScaleAccumulateNat fuel strm =
   let (MkStream next seed) = streamCosmicScaleTransform strm
-  in fusedHylomorphism fuel next (+) 0 seed
+  in fusedHylomorphismNat fuel next (+) 0 seed
+
+||| Zero-heap fused hylomorphism accumulator summing molecular weight projections using BoxNat fuel.
+public export
+fusedCosmicScaleAccumulateBoxNat : BoxNat -> FusedStream Bit3 -> Nat
+fusedCosmicScaleAccumulateBoxNat bfuel strm =
+  fusedCosmicScaleAccumulateNat (boxNatToNat bfuel) strm
+
+||| Zero-heap fused hylomorphism accumulator summing molecular weight projections over a stream of Bit3 states.
+public export
+fusedCosmicScaleAccumulate : Fuel -> FusedStream Bit3 -> Nat
+fusedCosmicScaleAccumulate (More f) strm =
+  fusedCosmicScaleAccumulateNat (boxNatToNat masterSubstrateGohFuel) strm
+fusedCosmicScaleAccumulate Dry _ = 0
 
 ||| Single-pass transducer mapping Fin 27 indices directly to Coord3D lattice coordinates without list materialization.
 public export

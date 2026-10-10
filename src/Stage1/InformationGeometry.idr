@@ -70,7 +70,7 @@ QuadranceInvariance3 b r g tot = natAdd (natAdd b r) g = tot
 
 ||| Erased 0 compile-time proof witness verifying 210 primorial budget invariance.
 public export
-0 prfChromogeometricBudgetInvariance : QuadranceInvariance3 27 128 55 210
+0 prfChromogeometricBudgetInvariance : QuadranceInvariance3 Stage1.FourGeometries.ellipticLatticeCapacity Stage1.FourGeometries.hyperbolicRomCapacity Stage1.FourGeometries.darkMatterTriangularResidue Stage1.FourGeometries.primorial210Budget
 prfChromogeometricBudgetInvariance = Refl
 
 ||| Represents a discrete chromogeometric metric space with erased compile-time QuadranceInvariance witness.

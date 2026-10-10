@@ -9,6 +9,7 @@ import Stage1.LinAlgebra.MetricTensor
 import Stage1.TypeTheory.TwoLevel
 import Stage1.TypeTheory.Staging
 import Stage1.MultisetTree
+import Stage0.OnSeq.FusedStream
 
 import Data.List
 
@@ -37,7 +38,7 @@ quadrea q1 q2 q3 = archimedesFunction q1 q2 q3
 ||| Constructs the 2x2 symmetric Gram Maxel of a triangle from its three side quadrances:
 ||| [[2*Q1, Q1 + Q2 - Q3], [Q1 + Q2 - Q3, 2*Q2]].
 public export
-gramMaxel : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> Maxel
+gramMaxel : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> Stage1.VexelMaxel.Maxel
 gramMaxel q1 q2 q3 =
   let g11Val = intToBoxInt 2 * q1
       g12Val = (q1 + q2) - q3
@@ -61,7 +62,7 @@ isCollinearQuadrance q1 q2 q3 =
 ||| Emergence theorem from 2x2 maxels:
 ||| Evaluates the Gram determinant Archimedes formula: 4 * det(g) * (x1*y2 - x2*y1)^2
 public export
-archimedesFromMaxels : Maxel -> BoxInt -> BoxInt -> BoxInt -> BoxInt -> BoxInt
+archimedesFromMaxels : Stage1.VexelMaxel.Maxel -> BoxInt -> BoxInt -> BoxInt -> BoxInt -> BoxInt
 archimedesFromMaxels metric x1 y1 x2 y2 =
   let crossDet = (x1 * y2) - (x2 * y1)
       detG     = detMetric metric
@@ -320,6 +321,125 @@ stagedQuadrea q1 q2 q3 = quote (quadrea q1 q2 q3)
 public export
 0 prfStagedQuadrea : (q1, q2, q3 : BoxInt) -> splice (stagedQuadrea q1 q2 q3) = quadrea q1 q2 q3
 prfStagedQuadrea q1 q2 q3 = inverseSpliceQuote (quadrea q1 q2 q3)
+
+------------------------------------------------------------------------
+-- 7. DEFORESTED SPREAD RECURRENCE STREAM & COMPANION MAXEL
+------------------------------------------------------------------------
+
+||| Constructs the 2x2 Companion Maxel transfer matrix for multiple spread recurrence:
+||| [[2 - 4s, -1], [1, 0]].
+public export
+companionSpreadMaxel : (s : BoxInt) -> Stage1.VexelMaxel.Maxel
+companionSpreadMaxel s =
+  let c11 = intToBoxInt 2 - (intToBoxInt 4 * s)
+      c12 = intToBoxInt (-1)
+      c21 = intToBoxInt 1
+      c22 = intToBoxInt 0
+  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
+                               , (MkPixel 1 2, c12)
+                               , (MkPixel 2 1, c21)
+                               , (MkPixel 2 2, c22)
+                               ]
+
+||| Step function for unrolling the multiple spread recurrence sequence:
+||| S_0 = 0, S_1 = s, S_{n+1} = (2 - 4s)*S_n - S_{n-1} + 2s.
+||| Evaluates in O(1) state without list allocation.
+public export
+spreadRecurrenceStep : (s : BoxInt) -> (Nat, BoxInt, BoxInt) -> Step (Nat, BoxInt, BoxInt) BoxInt
+spreadRecurrenceStep s (Z, _, _) =
+  Yield (intToBoxInt 0) (1, intToBoxInt 0, s)
+spreadRecurrenceStep s (1, s0, s1) =
+  let s2 = (intToBoxInt 2 - (intToBoxInt 4 * s)) * s1 - s0 + (intToBoxInt 2 * s)
+  in Yield s1 (2, s1, s2)
+spreadRecurrenceStep s (S (S n), sPrev, sCurr) =
+  let sNext = (intToBoxInt 2 - (intToBoxInt 4 * s)) * sCurr - sPrev + (intToBoxInt 2 * s)
+  in Yield sCurr (S (S (S n)), sCurr, sNext)
+
+||| Deforested FusedStream generator for the multiple spread polynomial values S_n(s).
+public export
+spreadRecurrenceStream : (s : BoxInt) -> FusedStream BoxInt
+spreadRecurrenceStream s = unfoldStream (spreadRecurrenceStep s) (Z, intToBoxInt 0, s)
+
+||| Evaluates the n-th multiple spread S_n(s) using O(1) space stream fold.
+public export
+evalNthSpreadStream : (n : Nat) -> (s : BoxInt) -> BoxInt
+evalNthSpreadStream n s =
+  foldStreamNat (S (S n)) (\_, curr => curr) (intToBoxInt 0) (fusedTake (S n) (spreadRecurrenceStream s))
+
+||| Audits the deforested multiple spread recurrence stream against canonical values:
+||| S_0(2) = 0, S_1(2) = 2, S_2(2) = -8, S_3(2) = 50.
+public export
+auditSpreadRecurrenceStreamProof : Bool
+auditSpreadRecurrenceStreamProof =
+  let s = intToBoxInt 2
+      s0 = evalNthSpreadStream 0 s
+      s1 = evalNthSpreadStream 1 s
+      s2 = evalNthSpreadStream 2 s
+      s3 = evalNthSpreadStream 3 s
+  in (s0 == intToBoxInt 0) &&
+     (s1 == intToBoxInt 2) &&
+     (s2 == intToBoxInt (-8)) &&
+     (s3 == intToBoxInt 50)
+
+||| Evaluates the n-th Cross Multiple Spread C_n(s) = 1 - S_n(s).
+public export
+evalNthCrossMultipleSpreadStream : (n : Nat) -> (s : BoxInt) -> BoxInt
+evalNthCrossMultipleSpreadStream n s = subBox (intToBoxInt 1) (evalNthSpreadStream n s)
+
+||| Constructs the 2x2 Companion Maxel transfer matrix for multiple cross recurrence:
+||| [[2(2c - 1), -1], [1, 0]].
+public export
+companionCrossMaxel : (c : BoxInt) -> Stage1.VexelMaxel.Maxel
+companionCrossMaxel c =
+  let c11 = intToBoxInt 2 * (intToBoxInt 2 * c - intToBoxInt 1)
+      c12 = intToBoxInt (-1)
+      c21 = intToBoxInt 1
+      c22 = intToBoxInt 0
+  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
+                               , (MkPixel 1 2, c12)
+                               , (MkPixel 2 1, c21)
+                               , (MkPixel 2 2, c22)
+                               ]
+
+||| Step function for unrolling the multiple cross recurrence sequence:
+||| c_0 = 1, c_1 = c, c_{n+1} = 2(2c - 1)*c_n - c_{n-1} + 2(1 - c).
+public export
+crossRecurrenceStep : (c : BoxInt) -> (Nat, BoxInt, BoxInt) -> Step (Nat, BoxInt, BoxInt) BoxInt
+crossRecurrenceStep c (Z, _, _) =
+  Yield (intToBoxInt 1) (1, intToBoxInt 1, c)
+crossRecurrenceStep c (1, c0, c1) =
+  let c2 = intToBoxInt 2 * (intToBoxInt 2 * c - intToBoxInt 1) * c1 - c0 + (intToBoxInt 2 * (intToBoxInt 1 - c))
+  in Yield c1 (2, c1, c2)
+crossRecurrenceStep c (S (S n), cPrev, cCurr) =
+  let cNext = intToBoxInt 2 * (intToBoxInt 2 * c - intToBoxInt 1) * cCurr - cPrev + (intToBoxInt 2 * (intToBoxInt 1 - c))
+  in Yield cCurr (S (S (S n)), cCurr, cNext)
+
+||| Deforested FusedStream generator for the multiple cross sequence c_n(c).
+public export
+crossRecurrenceStream : (c : BoxInt) -> FusedStream BoxInt
+crossRecurrenceStream c = unfoldStream (crossRecurrenceStep c) (Z, intToBoxInt 1, c)
+
+||| Evaluates the n-th multiple cross c_n(c) using O(1) space stream fold.
+public export
+evalNthCrossStream : (n : Nat) -> (c : BoxInt) -> BoxInt
+evalNthCrossStream n c =
+  foldStreamNat (S (S n)) (\_, curr => curr) (intToBoxInt 0) (fusedTake (S n) (crossRecurrenceStream c))
+
+||| Audits Wildberger Spread-Cross duality:
+||| C_n(1) == c_n(0) across the first 4 periods [1, 0, 1, 0].
+public export
+auditSpreadCrossDualityProof : Bool
+auditSpreadCrossDualityProof =
+  let c0 = evalNthCrossStream 0 (intToBoxInt 0)
+      c1 = evalNthCrossStream 1 (intToBoxInt 0)
+      c2 = evalNthCrossStream 2 (intToBoxInt 0)
+      c3 = evalNthCrossStream 3 (intToBoxInt 0)
+      cSpread0 = evalNthCrossMultipleSpreadStream 0 (intToBoxInt 1)
+      cSpread1 = evalNthCrossMultipleSpreadStream 1 (intToBoxInt 1)
+      cSpread2 = evalNthCrossMultipleSpreadStream 2 (intToBoxInt 1)
+      cSpread3 = evalNthCrossMultipleSpreadStream 3 (intToBoxInt 1)
+  in (c0 == cSpread0) && (c1 == cSpread1) && (c2 == cSpread2) && (c3 == cSpread3)
+
 
 
 

@@ -2,6 +2,7 @@ module Stage1.SpatialProjection
 
 import public Stage0.OnSeq.FusedStream
 import public Stage1.ScalePipeline.StreamDuality
+import Stage0.StructuralFuel
 import Data.List
 import Data.Fuel
 
@@ -19,26 +20,38 @@ record MaxelOperator where
 -- 1. TOTAL FUELED SPATIAL BOXEL GRID PROJECTION ON T^3
 ------------------------------------------------------------------------
 
+||| Total Nat fuel-driven projection of Maxel stream onto 3D Boxel grid T^3.
+public export
+projectFueledMaxelStreamNat : Nat -> FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
+projectFueledMaxelStreamNat 0 _ initialBoxel = pure initialBoxel
+projectFueledMaxelStreamNat (S k) (MkStream {s} step s0) initialBoxel =
+  go k s0 initialBoxel
+  where
+    go : Nat -> s -> Boxel -> StateTransition Boxel
+    go 0 _ b = pure b
+    go (S k') state b = case step state of
+      Done => pure b
+      Skip state' => go k' state' b
+      Yield (MkMaxelOp src tgt sec) state' =>
+        let matrix = MkMatrix src tgt Pos Zero Zero Pos
+        in driveSpatialUpdate sec matrix b >>= go k' state'
+
+||| Total BoxNat fuel-driven projection of Maxel stream onto 3D Boxel grid T^3.
+public export
+projectFueledMaxelStreamBoxNat : BoxNat -> FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
+projectFueledMaxelStreamBoxNat bfuel strm initialBoxel =
+  projectFueledMaxelStreamNat (boxNatToNat bfuel) strm initialBoxel
+
 ||| Total Fuel-driven projection of Maxel stream onto 3D Boxel grid T^3.
 public export
 projectFueledMaxelStream : Fuel -> FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
+projectFueledMaxelStream (More f) strm b = projectFueledMaxelStreamBoxNat masterSubstrateGohFuel strm b
 projectFueledMaxelStream Dry _ initialBoxel = pure initialBoxel
-projectFueledMaxelStream (More f) (MkStream {s} step s0) initialBoxel =
-  go f s0 initialBoxel
-  where
-    go : Fuel -> s -> Boxel -> StateTransition Boxel
-    go Dry _ b = pure b
-    go (More f') state b = case step state of
-      Done => pure b
-      Skip state' => go f' state' b
-      Yield (MkMaxelOp src tgt sec) state' =>
-        let matrix = MkMatrix src tgt Pos Zero Zero Pos
-        in driveSpatialUpdate sec matrix b >>= go f' state'
 
-||| Default fuel-bounded Boxel Stream projection over T^3 canvas.
+||| Default fuel-bounded Boxel Stream projection over T^3 canvas bounded by canonical substrate capacity (210).
 public export
 projectMaxelStream : FusedStream MaxelOperator -> Boxel -> StateTransition Boxel
-projectMaxelStream strm b = projectFueledMaxelStream (limit 1000) strm b
+projectMaxelStream strm b = projectFueledMaxelStreamBoxNat masterSubstrateGohFuel strm b
 
 ------------------------------------------------------------------------
 -- 2. HOMOMORPHISM INVARIANT PROOFS
