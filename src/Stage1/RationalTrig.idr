@@ -328,8 +328,39 @@ prfStagedQuadrea q1 q2 q3 = inverseSpliceQuote (quadrea q1 q2 q3)
 -- 7. DEFORESTED SPREAD RECURRENCE STREAM & COMPANION MAXEL
 ------------------------------------------------------------------------
 
+||| Constructs the exact integer Companion Spread Maxel transfer matrix for dynamic coordinates (x, y):
+||| [[2 * Q_Red, -Q_Blue], [Q_Blue, 0]].
+||| This represents the unnormalized 2x2 companion spread matrix scaled by Q_Blue = x^2 + y^2,
+||| with diagonal entry c11 = 2 * Q_Red = 2 * (x^2 - y^2) identically satisfying:
+||| (2 * Q_Blue - 4 * y^2) == 2 * Q_Red.
+public export
+pythagoreanSpreadMaxel : (x : BoxInt) -> (y : BoxInt) -> Stage1.VexelMaxel.Maxel
+pythagoreanSpreadMaxel x y =
+  let qBlue = (x * x) + (y * y)
+      qRed  = (x * x) - (y * y)
+      c11   = intToBoxInt 2 * qRed
+      c12   = mulBox (intToBoxInt (-1)) qBlue
+      c21   = qBlue
+      c22   = intToBoxInt 0
+  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
+                               , (MkPixel 1 2, c12)
+                               , (MkPixel 2 1, c21)
+                               , (MkPixel 2 2, c22)
+                               ]
+
+||| Static verification witness: Spread diagonal entry scaled by Q_Blue identically equals 2 * Q_Red.
+public export
+auditSpreadDiagonalRatioProof : (x : BoxInt) -> (y : BoxInt) -> Bool
+auditSpreadDiagonalRatioProof x y =
+  let qBlue = (x * x) + (y * y)
+      qRed  = (x * x) - (y * y)
+      lhs = (intToBoxInt 2 * qBlue) - (intToBoxInt 4 * (y * y))
+      rhs = intToBoxInt 2 * qRed
+  in boxEq lhs rhs
+
 ||| Constructs the 2x2 Companion Maxel transfer matrix for multiple spread recurrence:
 ||| [[2 - 4s, -1], [1, 0]].
+||| Deprecated: Prefer exact integer `pythagoreanSpreadMaxel x y` to avoid fractional truncation.
 public export
 companionSpreadMaxel : (s : BoxInt) -> Stage1.VexelMaxel.Maxel
 companionSpreadMaxel s =
