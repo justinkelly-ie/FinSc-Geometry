@@ -10,6 +10,8 @@ import Stage1.TypeTheory.TwoLevel
 import Stage1.TypeTheory.Staging
 import Stage1.MultisetTree
 import Stage0.OnSeq.FusedStream
+import Stage1.MaxelPolyBridge
+import Data.Fuel
 
 import Data.List
 
@@ -366,7 +368,12 @@ evalNthSpreadStream : (n : Nat) -> (s : BoxInt) -> BoxInt
 evalNthSpreadStream n s =
   foldStreamNat (S (S n)) (\_, curr => curr) (intToBoxInt 0) (fusedTake (S n) (spreadRecurrenceStream s))
 
-||| Audits the deforested multiple spread recurrence stream against canonical values:
+||| Evaluates the n-th multiple spread S_n(s) in O(log n) steps via companion Maxel fast power (Rule 04).
+public export
+evalNthSpreadFast : (n : Nat) -> (s : BoxInt) -> BoxInt
+evalNthSpreadFast n s = fastSpreadPower (limit (n + 10)) n s
+
+||| Audits the deforested multiple spread recurrence stream and fast O(log N) power against canonical values:
 ||| S_0(2) = 0, S_1(2) = 2, S_2(2) = -8, S_3(2) = 50.
 public export
 auditSpreadRecurrenceStreamProof : Bool
@@ -376,10 +383,15 @@ auditSpreadRecurrenceStreamProof =
       s1 = evalNthSpreadStream 1 s
       s2 = evalNthSpreadStream 2 s
       s3 = evalNthSpreadStream 3 s
+      f0 = evalNthSpreadFast 0 s
+      f1 = evalNthSpreadFast 1 s
+      f2 = evalNthSpreadFast 2 s
+      f3 = evalNthSpreadFast 3 s
   in (s0 == intToBoxInt 0) &&
      (s1 == intToBoxInt 2) &&
      (s2 == intToBoxInt (-8)) &&
-     (s3 == intToBoxInt 50)
+     (s3 == intToBoxInt 50) &&
+     (f0 == s0) && (f1 == s1) && (f2 == s2) && (f3 == s3)
 
 ||| Evaluates the n-th Cross Multiple Spread C_n(s) = 1 - S_n(s).
 public export
