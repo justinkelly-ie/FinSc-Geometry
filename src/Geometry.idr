@@ -17,10 +17,12 @@ import public Stage1.LinAlgebra.TernaryClassifier
 import public Stage1.MetricalBounds
 import public Stage1.MonadicMetricSpace
 import public Stage1.MotivicProof
+import public Stage1.MultisetMetricTensor
 import public Stage1.MultisetMetricTensor55
 import public Stage1.QuantumTransition
 import public Stage1.RationalTrig
 import public Stage1.SpatialProjection
+import public Stage1.SubstrateMetricTensor
 import public Stage1.SubstrateMetricTensor55
 import public Stage1.WilsonPolyhedra
 

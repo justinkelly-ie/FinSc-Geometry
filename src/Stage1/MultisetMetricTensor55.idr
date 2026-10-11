@@ -1,5 +1,7 @@
 module Stage1.MultisetMetricTensor55
 
+import public Stage1.MultisetMetricTensor
+import Stage1.SubstrateMetricTensor
 import Stage0.BoxInt
 import Stage0.Multiset
 import Data.List
@@ -10,56 +12,27 @@ import Stage1.FourGeometries
 %default total
 
 ------------------------------------------------------------------------
--- 1. METRIC TENSOR BASIS PAIRS AS MULTISET ELEMENT KEYS
+-- BACKWARD COMPATIBILITY ALIASES
 ------------------------------------------------------------------------
 
-||| Basis index pair (i, j) for symmetric 10D tensor entries (1 <= i <= j <= 10).
+||| Legacy type alias for MultisetMetricTensor (dim = 10).
 public export
-record MetricBasisPair where
-  constructor MkBasisPair
-  row : Nat
-  col : Nat
+MultisetMetricTensor55 : Type
+MultisetMetricTensor55 = MultisetMetricTensor DimSubstrate
 
-public export
-Eq MetricBasisPair where
-  (MkBasisPair r1 c1) == (MkBasisPair r2 c2) = (r1 == r2) && (c1 == c2)
-
-------------------------------------------------------------------------
--- 2. THE 10D METRIC TENSOR AS A PURE MULTISET (BOX)
-------------------------------------------------------------------------
-
-||| The 10D Symmetric Metric Tensor g_μν defined natively as a Multiset (Box) of 55 Weighted Basis Pairs:
-||| M_g = ∑ k_ij · (e_i ⊗ e_j)
-public export
-record MultisetMetricTensor55 where
-  constructor MkMultisetMetricTensor55
-  basisMultiset : Box MetricBasisPair
-  determinant   : BoxInt
-
-||| Smart constructor building the canonical 55-component Parabolic Substrate Multiset Metric Tensor.
+||| Legacy smart constructor alias.
 public export
 canonicalMultisetMetric55 : MultisetMetricTensor55
-canonicalMultisetMetric55 =
-  let dim = Stage1.FourGeometries.phaseSpaceBasisDim
-      pairs = [ MkBasisPair i j | i <- [1..dim], j <- [1..dim], i <= j ]
-      m = foldl (\acc, p => insertBox p (intToBoxInt 1) acc) emptyBox pairs
-  in MkMultisetMetricTensor55 m (intToBoxInt 0)
+canonicalMultisetMetric55 = canonicalSubstrateMultisetMetric
 
-------------------------------------------------------------------------
--- 3. FORMAL INVARIANT AUDIT PROOFS
-------------------------------------------------------------------------
-
-||| Audits the Multiset Metric Tensor:
-||| 1. Determinant det(M_g) is identically 0 (Parabolic Substrate).
-||| 2. Canonical multiset determinant is zero.
+||| Legacy audit proof function.
 %inline
 public export
 auditMultisetMetricTensor55Proof : Bool
 auditMultisetMetricTensor55Proof =
-  let m = canonicalMultisetMetric55
-  in unwrapBox (determinant m) == 0
+  unwrapBox (determinant canonicalMultisetMetric55) == 0
 
-||| Compile-time proof witness verifying that 10D phase space metric components match darkMatterTriangularResidue.
+||| Legacy compile-time proof witness.
 public export
 0 prfMultisetMetric55DimensionMatchesPhaseSpaceBasis : Stage1.FourGeometries.darkMatterTriangularResidue = 55
 prfMultisetMetric55DimensionMatchesPhaseSpaceBasis = Refl
