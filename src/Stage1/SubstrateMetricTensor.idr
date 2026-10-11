@@ -41,9 +41,19 @@ Eq (SymmetricMetricTensor dim) where
 -- 2. CANONICAL DIMENSIONS & TYPE ALIASES
 ------------------------------------------------------------------------
 
+||| Canonical 10D phase space basis dimension: 4 spacetime + 3 color + 3 scale.
+public export
+PhaseSpaceBasisDim : Nat
+PhaseSpaceBasisDim = Stage1.FourGeometries.phaseSpaceBasisDim
+
+||| Parabolic 10D metric tensor component residue: T_10 = sum_{k=1}^10 k = 55.
+public export
+DarkMatterCapacity : Nat
+DarkMatterCapacity = Stage1.FourGeometries.darkMatterTriangularResidue
+
 public export
 DimSubstrate : BoxInt
-DimSubstrate = intToBoxInt 10
+DimSubstrate = intToBoxInt (cast PhaseSpaceBasisDim)
 
 public export
 dimSubstrate : BoxInt
@@ -171,3 +181,12 @@ prfSpacetimeMetricComponentsIs10 = Refl
 public export
 0 prfColorMetricComponentsIs6 : unwrapBox (triangularBoxInt DimColor) = 6
 prfColorMetricComponentsIs6 = Refl
+
+||| Audits the Substrate Metric Tensor:
+||| Determinant det(M_g) is identically 0 (Parabolic Substrate) and component index bounds match.
+public export
+auditSubstrateMetricTensorProof : Bool
+auditSubstrateMetricTensorProof =
+  (unwrapBox (determinant canonicalSubstrateMetric) == 0) &&
+  (metricComponentIndex DimSubstrate 1 1 == 1) &&
+  (metricComponentIndex DimSubstrate 10 10 == DarkMatterCapacity)
