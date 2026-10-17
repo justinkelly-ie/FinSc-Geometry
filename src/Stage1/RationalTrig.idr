@@ -12,7 +12,7 @@ import Stage1.MultisetTree
 import Stage0.OnSeq.FusedStream
 import Stage1.MaxelPolyBridge
 import Data.Fuel
-
+import Data.Vect
 import Data.List
 
 %default total
@@ -115,6 +115,32 @@ tetrahedralSpreadRatio = (intToBoxInt 8, intToBoxInt 9)
 public export
 spreadPolynumberRecurrence : Nat -> Polynumber
 spreadPolynumberRecurrence n = spreadPolynumber n
+
+||| Degree-certified multiple spread recurrence generator:
+||| S_n(s) has certified degree n at compile time.
+public export
+spreadDepRecurrence : (n : Nat) -> DepPolynumber n
+spreadDepRecurrence = spreadDepPolynumber
+
+||| Deforested stream wave stepping: streams multiple spread polynomials (n, S_n)
+||| in O(1) memory via companion transfer matrix recursion.
+public export
+spreadWaveStream : FusedStream (Nat, Polynumber)
+spreadWaveStream = spreadRecurrenceStream
+
+||| Evaluates the tetrahedral spread S_3 with certified degree 3:
+||| S_3(s) = 9s - 24s^2 + 16s^3.
+public export
+tetrahedralSpreadDepPoly : DepPolynumber 3
+tetrahedralSpreadDepPoly = spreadDepRecurrence 3
+
+||| Compile-time audit: tetrahedral spread polynomial S_3 has certified degree 3
+||| and exact coefficients [0, 9, -24, 16].
+public export
+0 verifyTetrahedralSpreadDegree :
+  toList Stage1.RationalTrig.tetrahedralSpreadDepPoly.polyCoeffs =
+  [intToBoxInt 0, intToBoxInt 9, intToBoxInt (-24), intToBoxInt 16]
+verifyTetrahedralSpreadDegree = Refl
 
 ------------------------------------------------------------------------
 -- 3. RATIONAL SNELL'S LAW & TRIPLE SPREAD LAW
