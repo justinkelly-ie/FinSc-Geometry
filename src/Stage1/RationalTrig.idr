@@ -428,7 +428,7 @@ evalNthSpreadStream n s =
 ||| Evaluates the n-th multiple spread S_n(s) in O(log n) steps via companion Maxel fast power (Rule 04).
 public export
 evalNthSpreadFast : (n : Nat) -> (s : BoxInt) -> BoxInt
-evalNthSpreadFast n s = fastSpreadPower (limit (n + 10)) n s
+evalNthSpreadFast n s = fastSpreadPowerNat (n + 10) n s
 
 ||| Audits the deforested multiple spread recurrence stream and fast O(log N) power against canonical values:
 ||| S_0(2) = 0, S_1(2) = 2, S_2(2) = -8, S_3(2) = 50.
