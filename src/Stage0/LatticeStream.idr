@@ -38,7 +38,7 @@ streamLatticeCoords = unfoldLatticeCoords
 ||| Evaluated list of all 27 3D lattice coordinates.
 public export
 allLatticeCoords : List Coord3D
-allLatticeCoords = runFueledStreamNat (boxNatToNat ellipticGohFuel) streamLatticeCoords
+allLatticeCoords = runFueledStreamFuelModel ellipticGohFuelModel streamLatticeCoords
 
 
 ------------------------------------------------------------------------
@@ -55,6 +55,11 @@ public export
 fusedFilterLattice : (Coord3D -> Bool) -> FusedStream Coord3D -> FusedStream Coord3D
 fusedFilterLattice = filterStream
 
+||| Evaluates a lattice stream into a concrete List of 3D coordinates using model-indexed GohFuel.
+public export
+runLatticeStreamFuelModel : GohFuel cap -> FusedStream Coord3D -> List Coord3D
+runLatticeStreamFuelModel = runFueledStreamFuelModel
+
 ||| Evaluates a lattice stream into a concrete List of 3D coordinates using total structural Nat fuel.
 public export
 runLatticeStreamNat : Nat -> FusedStream Coord3D -> List Coord3D
@@ -68,7 +73,7 @@ runLatticeStreamBoxNat bfuel = runFueledStreamNat (boxNatToNat bfuel)
 ||| Evaluates a lattice stream into a concrete List of 3D coordinates.
 public export
 runLatticeStream : Fuel -> FusedStream Coord3D -> List Coord3D
-runLatticeStream (More f) = runFueledStreamNat (boxNatToNat masterSubstrateGohFuel)
+runLatticeStream (More f) = runFueledStreamFuelModel masterSubstrateGohFuelModel
 runLatticeStream Dry = \_ => []
 
 ------------------------------------------------------------------------
@@ -201,6 +206,13 @@ streamCodifferentialDEC : (SimplexCell -> List (SimplexCell, BoxInt)) ->
                           FusedStream (SimplexCell, BoxInt)
 streamCodifferentialDEC bndFn = streamBoundaryTransducer bndFn
 
+||| Sifts out canceled interior boundaries (weight == 0) from an accumulated multiset using model-indexed GohFuel.
+public export
+consolidateBoundaryStreamFuelModel : GohFuel cap -> FusedStream (SimplexCell, BoxInt) -> Box SimplexCell
+consolidateBoundaryStreamFuelModel fuel strm =
+  let rawBox = foldStreamFuelModel fuel (\acc, (cell, w) => insertBoxFast cell w acc) emptyBox strm
+  in consolidateBox rawBox
+
 ||| Sifts out canceled interior boundaries (weight == 0) from an accumulated multiset using BoxNat fuel.
 public export
 consolidateBoundaryStreamBoxNat : BoxNat -> FusedStream (SimplexCell, BoxInt) -> Box SimplexCell
@@ -212,7 +224,7 @@ consolidateBoundaryStreamBoxNat bfuel strm =
 public export
 consolidateBoundaryStream : Fuel -> FusedStream (SimplexCell, BoxInt) -> Box SimplexCell
 consolidateBoundaryStream (More f) strm =
-  consolidateBoundaryStreamBoxNat masterSubstrateGohFuel strm
+  consolidateBoundaryStreamFuelModel masterSubstrateGohFuelModel strm
 consolidateBoundaryStream Dry _ = emptyBox
 
 ||| Audits simplicial coboundary nilpotency: \partial \circ \partial = 0 (d^2 = 0) on the discrete torus.
@@ -223,7 +235,7 @@ auditSimplicialNilpotencyProof =
       face2D = (Cell2D c0 DirEast DirNorth, intToBoxInt 1)
       b1Strm = streamBoundaryTransducer cell2DBoundary (stream [face2D])
       b0Strm = streamBoundaryTransducer cell1DBoundary b1Strm
-      b0Consolidated = consolidateBoundaryStream (limit 8) b0Strm
+      b0Consolidated = consolidateBoundaryStreamFuelModel (gohFuelForCapacity 8) b0Strm
   in null (items b0Consolidated)
 
 ||| Audits 3D simplicial coboundary nilpotency: \partial_1 \circ \partial_2 = 0 on 3-cells.
@@ -234,7 +246,7 @@ auditSimplicialNilpotency3DProof =
       vol3D = (Cell3D c0, intToBoxInt 1)
       b2Strm = streamBoundaryTransducer cell3DBoundary (stream [vol3D])
       b1Strm = streamBoundaryTransducer cell2DBoundary b2Strm
-      b1Consolidated = consolidateBoundaryStream (limit 24) b1Strm
+      b1Consolidated = consolidateBoundaryStreamFuelModel (gohFuelForCapacity 24) b1Strm
   in null (items b1Consolidated)
 
 ||| Unified compile-time audit of streaming DEC operators:
