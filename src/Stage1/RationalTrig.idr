@@ -54,6 +54,17 @@ quadreaMaxel : BoxInt -> BoxInt -> BoxInt -> BoxInt
 quadreaMaxel q1 q2 q3 =
   detMetric (gramMaxel q1 q2 q3)
 
+||| Dimension-checked 2x2 Gram SquareMaxel of a triangle from its three side quadrances:
+public export
+gramSquareMaxel : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> SquareMaxel 2
+gramSquareMaxel q1 q2 q3 = maxelToSquareMaxel 2 (gramMaxel q1 q2 q3)
+
+||| Computes Quadrea directly as the determinant of the 2x2 Gram SquareMaxel.
+public export
+quadreaSquareMaxel : BoxInt -> BoxInt -> BoxInt -> BoxInt
+quadreaSquareMaxel q1 q2 q3 =
+  detMetric (squareMaxelToMaxel (gramSquareMaxel q1 q2 q3))
+
 ||| Collinearity predicate: three points are collinear (lie on a geodesic)
 ||| if and only if Archimedes' function on their side quadrances vanishes.
 public export
@@ -399,6 +410,16 @@ companionSpreadMaxel s =
                                , (MkPixel 2 1, c21)
                                , (MkPixel 2 2, c22)
                                ]
+
+||| Dimension-checked 2x2 Companion Spread SquareMaxel transfer matrix for dynamic coordinates (x, y):
+public export
+pythagoreanSpreadSquareMaxel : (x : BoxInt) -> (y : BoxInt) -> SquareMaxel 2
+pythagoreanSpreadSquareMaxel x y = maxelToSquareMaxel 2 (pythagoreanSpreadMaxel x y)
+
+||| Dimension-checked 2x2 Companion Spread SquareMaxel transfer matrix for multiple spread recurrence:
+public export
+companionSpreadSquareMaxel : (s : BoxInt) -> SquareMaxel 2
+companionSpreadSquareMaxel s = maxelToSquareMaxel 2 (companionSpreadMaxel s)
 
 ||| Step function for unrolling the multiple spread recurrence sequence:
 ||| S_0 = 0, S_1 = s, S_{n+1} = (2 - 4s)*S_n - S_{n-1} + 2s.

@@ -43,6 +43,24 @@ public export
 geometryTrace : FundamentalGeometry -> Stage0.BoxInt.BoxInt
 geometryTrace geom = traceMetric (geometryMetric geom)
 
+||| Maps each fundamental geometry to its dimension-checked 2x2 SquareMaxel metric tensor.
+%inline
+public export
+geometrySquareMetric : FundamentalGeometry -> SquareMaxel 2
+geometrySquareMetric geom = maxelToSquareMaxel 2 (geometryMetric geom)
+
+||| Computes the exact metric determinant for a 2x2 SquareMaxel fundamental geometry.
+%inline
+public export
+geometrySquareDeterminant : FundamentalGeometry -> Stage0.BoxInt.BoxInt
+geometrySquareDeterminant geom = detMetric (squareMaxelToMaxel (geometrySquareMetric geom))
+
+||| Computes the exact metric trace for a 2x2 SquareMaxel fundamental geometry.
+%inline
+public export
+geometrySquareTrace : FundamentalGeometry -> Stage0.BoxInt.BoxInt
+geometrySquareTrace geom = traceMetric (squareMaxelToMaxel (geometrySquareMetric geom))
+
 ||| Evaluates the algebraic Quadrance Q_g(v) of a 2D Vexel under a fundamental geometry:
 ||| Q_g(v) = v1^2 * g11 + 2 * v1 * v2 * g12 + v2^2 * g22.
 %inline
