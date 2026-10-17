@@ -304,5 +304,5 @@ auditFusedLatticeStreamProof =
   let c0 = MkCoord3D Bit3Zero Bit3Zero Bit3Zero
       dirs = [DirEast, DirNorth, DirUp]
       strm = fusedLatticeStream c0 dirs
-      res = runFueledStreamNat (boxNatToNat (gohFuel (length dirs))) strm
+      res = runFueledStreamFuelModel (gohFuelForCapacity (length dirs)) strm
   in length res == 3
