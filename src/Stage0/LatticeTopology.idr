@@ -165,7 +165,7 @@ public export
 stepFluxPropagation : BoxInt -> Vect 27 BoxInt -> Vect 27 BoxInt
 stepFluxPropagation kappa grid =
   let lap = discreteLaplacian27 grid
-  in zipWith (\v, l => addBox v (intToBoxInt (unwrapBox kappa * unwrapBox l))) grid lap
+  in zipWith (\v, l => addBox v (mulBox kappa l)) grid lap
 
 ------------------------------------------------------------------------
 -- 4. PURE BOXEL MULTISET LATTICE & FLUX OPERATORS

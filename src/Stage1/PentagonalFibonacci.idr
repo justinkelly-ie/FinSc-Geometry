@@ -49,11 +49,11 @@ fibonacciNumber n =
 public export
 goldenRatioConvergent : Nat -> UnixelFraction
 goldenRatioConvergent n =
-  let fN   = unwrapBox (fibonacciNumber n)
-      fNP1 = unwrapBox (fibonacciNumber (S n))
-  in if fN <= 0
+  let fN   = fibonacciNumber n
+      fNP1 = fibonacciNumber (S n)
+  in if fN <= intToBoxInt 0
        then mkUnixelFraction (intToBoxInt 1) 1
-       else mkUnixelFraction (intToBoxInt fNP1) (integerToNat fN)
+       else mkUnixelFraction fNP1 (boxToNat fN)
 
 ------------------------------------------------------------------------
 -- 2. PENTAGONAL 5-CYCLE PERMUTATION MAXEL (Z_5 SYMMETRY)
@@ -103,13 +103,13 @@ stagedPentagonalClosure = quote (powerPentagonalMaxel 5)
 public export
 auditFibonacciSequence : Bool
 auditFibonacciSequence =
-  unwrapBox (fibonacciNumber 1) == 1 &&
-  unwrapBox (fibonacciNumber 2) == 1 &&
-  unwrapBox (fibonacciNumber 3) == 2 &&
-  unwrapBox (fibonacciNumber 4) == 3 &&
-  unwrapBox (fibonacciNumber 5) == 5 &&
-  unwrapBox (fibonacciNumber 6) == 8 &&
-  unwrapBox (fibonacciNumber 7) == 13
+  fibonacciNumber 1 == intToBoxInt 1 &&
+  fibonacciNumber 2 == intToBoxInt 1 &&
+  fibonacciNumber 3 == intToBoxInt 2 &&
+  fibonacciNumber 4 == intToBoxInt 3 &&
+  fibonacciNumber 5 == intToBoxInt 5 &&
+  fibonacciNumber 6 == intToBoxInt 8 &&
+  fibonacciNumber 7 == intToBoxInt 13
 
 ||| Verified Invariant: 5-cycle permutation closes identically at power 5: sigma_5^5 = I_5.
 public export
@@ -122,4 +122,4 @@ public export
 auditGoldenRatio13Smooth : Bool
 auditGoldenRatio13Smooth =
   let phi7 = goldenRatioConvergent 7
-  in unwrapBox phi7.num == 21 && unwrapUnixel phi7.den == 13
+  in phi7.num == intToBoxInt 21 && phi7.den == MkUnixel 13

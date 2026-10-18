@@ -177,17 +177,17 @@ prfSubstrateSectorsSumTo55 = Refl
 
 ||| Definitional proof that 10D Substrate Metric Tensor has exactly 55 components.
 public export
-0 prfSubstrateMetricComponentsIs55 : unwrapBox (triangularBoxInt DimSubstrate) = 55
+0 prfSubstrateMetricComponentsIs55 : triangularBoxInt DimSubstrate = intToBoxInt 55
 prfSubstrateMetricComponentsIs55 = Refl
 
 ||| Definitional proof that 4D Spacetime Metric Tensor has exactly 10 components.
 public export
-0 prfSpacetimeMetricComponentsIs10 : unwrapBox (triangularBoxInt DimSpacetime) = 10
+0 prfSpacetimeMetricComponentsIs10 : triangularBoxInt DimSpacetime = intToBoxInt 10
 prfSpacetimeMetricComponentsIs10 = Refl
 
 ||| Definitional proof that 3D Color Metric Tensor has exactly 6 components.
 public export
-0 prfColorMetricComponentsIs6 : unwrapBox (triangularBoxInt DimColor) = 6
+0 prfColorMetricComponentsIs6 : triangularBoxInt DimColor = intToBoxInt 6
 prfColorMetricComponentsIs6 = Refl
 
 ||| Audits the Substrate Metric Tensor:

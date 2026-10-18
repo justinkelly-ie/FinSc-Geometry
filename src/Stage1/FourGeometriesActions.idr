@@ -108,12 +108,12 @@ parabolicDissipationAction v1 v2 = evaluateQuadrance ParabolicGeom v1 v2
 public export
 substrateCausalArrowAction : Stage1.VexelMaxel.Maxel -> Bool
 substrateCausalArrowAction g =
-  unwrapBox (g22 g) == 0 && unwrapBox (g12 g) == 1
+  boxIsZero (g22 g) && g12 g == intToBoxInt 1
 
 public export
 substrateCausalArrowActionBit : Stage1.VexelMaxel.Maxel -> Bit
 substrateCausalArrowActionBit g =
-  if unwrapBox (g22 g) == 0 && unwrapBox (g12 g) == 1 then One else Zero
+  if boxIsZero (g22 g) && g12 g == intToBoxInt 1 then One else Zero
 
 
 ------------------------------------------------------------------------
@@ -175,10 +175,10 @@ auditFourGeometriesDeterminantsProof =
       detHyp = geometryDeterminant HyperbolicGeom
       detPar = geometryDeterminant ParabolicGeom
       detSub = geometryDeterminant SubstrateGeom
-  in unwrapBox detEll == 1 &&
-     unwrapBox detHyp == (-1) &&
-     unwrapBox detPar == 0 &&
-     unwrapBox detSub == (-1)
+  in detEll == intToBoxInt 1 &&
+     detHyp == intToBoxInt (-1) &&
+     boxIsZero detPar &&
+     detSub == intToBoxInt (-1)
 
 ||| Audits the Cosmic Synthesis of the 4 Geometries:
 ||| 1. Quadrance of (1, 1) under Hyperbolic is exactly 0 (Lightcone).
@@ -194,12 +194,8 @@ auditFourGeometriesCosmicSynthesisProof =
       bTotal = cosmicBudgetByGeometry EllipticGeom +
                cosmicBudgetByGeometry HyperbolicGeom +
                cosmicBudgetByGeometry ParabolicGeom
-      okHyp = case unwrapBox qHyp of
-                0 => True
-                _ => False
-      okEll = case unwrapBox qEll of
-                1 => True
-                _ => False
+      okHyp = boxIsZero qHyp
+      okEll = qEll == intToBoxInt 1
       okTot = natEq bTotal primorial210Budget
   in okHyp && okEll && okTot
 

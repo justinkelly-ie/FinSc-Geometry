@@ -162,7 +162,7 @@ verifyTetrahedralSpreadDegree = Refl
 public export
 refractSpread : (n1Sq : BoxInt) -> (n2Sq : BoxInt) -> (s1 : BoxInt) -> BoxInt
 refractSpread n1Sq n2Sq s1 =
-  let denom = if unwrapBox n2Sq == 0 then intToBoxInt 1 else n2Sq
+  let denom = if boxIsZero n2Sq then intToBoxInt 1 else n2Sq
   in (n1Sq * s1) `div` denom
 
 ||| Evaluates the Wildberger Triple Spread Law invariant:
@@ -237,8 +237,8 @@ public export
 boxSpread : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> UnixelFraction
 boxSpread q1 q2 q3 =
   let numVal = quadrea q1 q2 q3
-      denVal = unwrapBox (intToBoxInt 4 * q1 * q2)
-      denNat = if denVal <= 0 then 1 else integerToNat denVal
+      denBox = intToBoxInt 4 * q1 * q2
+      denNat = boxIntToPositiveNat denBox
   in mkUnixelFraction numVal denNat
 
 ||| Computes the exact Rational Spread between Vexel displacements (vertex -> a) and (vertex -> b).

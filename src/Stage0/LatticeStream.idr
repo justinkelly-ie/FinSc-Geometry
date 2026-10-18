@@ -259,5 +259,5 @@ auditDECStreamProof =
   (let c0 = fin27ToCoord 0
        (star0, s0) = hodgeStarCell (Cell0D c0)
        (starStar0, s1) = hodgeStarCell star0
-   in starStar0 == Cell0D c0 && unwrapBox (mulBox s0 s1) == 1)
+   in starStar0 == Cell0D c0 && mulBox s0 s1 == intToBoxInt 1)
 

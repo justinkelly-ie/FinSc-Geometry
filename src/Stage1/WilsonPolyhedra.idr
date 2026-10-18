@@ -199,9 +199,8 @@ public export
 polyhedralCrossEntropyDeficit : WilsonPolyhedron -> Nat
 polyhedralCrossEntropyDeficit poly =
   let tr = wilsonPolyhedronTrace poly
-      reVal = unwrapBox (real tr)
-      diff = 3 - reVal
-  in integerToNat (if diff >= 0 then diff else -diff)
+      diff = subBox (intToBoxInt 3) (real tr)
+  in boxToNat (absBox diff)
 
 ------------------------------------------------------------------------
 -- 4. NON-ABELIAN GAUGE TRANSFORMATIONS & BIANCHI THEOREMS
@@ -231,18 +230,16 @@ gaugeTransformPolyhedron vc ve vw vn vs vu vd (MkWilsonPolyhedron e w n s u d) =
 
 ||| Audits 3D Wilson Polyhedron Multiplicative Bianchi Closure:
 ||| Proves that on a flat / source-free gauge lattice, W_cube = I_3x3 and Deficit = 0.
-%inline
 public export
 auditWilsonPolyhedronBianchiClosureProof : Bool
 auditWilsonPolyhedronBianchiClosureProof =
   let flat = flatWilsonPolyhedron3
       tr = wilsonPolyhedronTrace flat
       deficit = polyhedralCrossEntropyDeficit flat
-  in unwrapBox (real tr) == 3 && deficit == 0
+  in real tr == intToBoxInt 3 && deficit == 0
 
 ||| Audits Non-Abelian Chromogeometric Gauge Invariance:
 ||| Proves that the Polyhedral trace is strictly invariant under local SU(3) color rotations (swapRG).
-%inline
 public export
 auditChromogeometricColorGaugeInvarianceProof : Bool
 auditChromogeometricColorGaugeInvarianceProof =
@@ -250,12 +247,11 @@ auditChromogeometricColorGaugeInvarianceProof =
       transformed = gaugeTransformPolyhedron swapRG identityColorOp3 identityColorOp3 identityColorOp3 identityColorOp3 identityColorOp3 identityColorOp3 flat
       tr1 = wilsonPolyhedronTrace flat
       tr2 = wilsonPolyhedronTrace transformed
-  in unwrapBox (real tr1) == unwrapBox (real tr2)
+  in real tr1 == real tr2
 
 ||| Audits Hadronic Singlet Polyhedral Invariance:
 ||| Proves that a color-neutral singlet state (R+G+B) remains color-neutral
 ||| when parallel transported around a closed Wilson Polyhedron.
-%inline
 public export
 auditHadronSingletPolyhedralInvarianceProof : Bool
 auditHadronSingletPolyhedralInvarianceProof =

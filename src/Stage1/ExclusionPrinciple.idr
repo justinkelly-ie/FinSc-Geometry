@@ -49,7 +49,7 @@ addFermion Occupied = (Occupied, False) -- Exclusion triggered!
 public export
 fermiDiracZeroTemp : (energy : Stage0.BoxInt.BoxInt) -> (eFermi : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 fermiDiracZeroTemp energy eFermi =
-  if unwrapBox energy <= unwrapBox eFermi
+  if energy <= eFermi
      then Stage0.BoxInt.intToBoxInt 1
      else Stage0.BoxInt.intToBoxInt 0
 
@@ -82,9 +82,9 @@ auditFermionicBinaryOccupancyProof =
   let n1 = occupancyToInt Occupied
       n2 = occupancyToInt Vacant
       tot = n1 + n2
-  in unwrapBox n1 == 1 &&
-     unwrapBox n2 == 0 &&
-     unwrapBox tot <= 2
+  in n1 == Stage0.BoxInt.intToBoxInt 1 &&
+     boxIsZero n2 &&
+     tot <= Stage0.BoxInt.intToBoxInt 2
 
 ||| Audits Zero-Temperature Fermi Surface Step Function:
 ||| For E_Fermi = 50:
@@ -95,5 +95,5 @@ auditZeroTemperatureFermiSurfaceProof =
   let ef = Stage0.BoxInt.intToBoxInt 50
       nCore = fermiDiracZeroTemp (Stage0.BoxInt.intToBoxInt 30) ef
       nOuter = fermiDiracZeroTemp (Stage0.BoxInt.intToBoxInt 70) ef
-  in unwrapBox nCore == 1 &&
-     unwrapBox nOuter == 0
+  in nCore == Stage0.BoxInt.intToBoxInt 1 &&
+     boxIsZero nOuter

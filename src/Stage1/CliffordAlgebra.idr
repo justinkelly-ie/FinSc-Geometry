@@ -86,7 +86,7 @@ reflectVector : Maxel -> (normal : Vexel) -> (v : Vexel) -> Vexel
 reflectVector metric n v =
   let vDotN = metricInnerVexel metric v n
       nDotN = metricInnerVexel metric n n
-      denom = if unwrapBox nDotN == 0 then intToBoxInt 1 else nDotN
+      denom = if boxIsZero nDotN then intToBoxInt 1 else nDotN
       scaleFactor = (intToBoxInt 2 * vDotN) `div` denom
       scaledN = scaleVexel scaleFactor n
   in subVexel v scaledN
@@ -126,4 +126,4 @@ auditDiracCurrentConservationProof =
                      , intToBoxInt (-22)-- -Z outflow
                      ]
       netDiv = sum faceCurrents
-  in unwrapBox netDiv == 0
+  in boxIsZero netDiv

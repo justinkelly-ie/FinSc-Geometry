@@ -116,7 +116,7 @@ bornProbabilityChance s st =
   let a = lookupStateAmplitude s st
       numer = normSqAmplitude a
       denomBox = totalBornNormSq st
-      denomNat = integerToNat (unwrapBox denomBox)
+      denomNat = boxToNat denomBox
   in if denomNat == 0
        then mkUnixelFraction (intToBoxInt 0) 1
        else mkUnixelFraction numer denomNat
