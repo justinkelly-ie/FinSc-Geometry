@@ -2,6 +2,7 @@ module Stage1.CliffordAlgebra
 
 import Stage0.BoxInt
 import Stage1.VexelMaxel
+import Stage1.MultisetTree
 import Stage1.LinAlgebra.BilinearProduct
 
 %default total
@@ -107,8 +108,8 @@ auditCliffordGeometricProductProof =
 ||| j_0 = s^2 + B^2, j_k = 2 s v_k.
 public export
 diracSpinorCurrent : Multivector -> Vexel
-diracSpinorCurrent (MkMultivector s v (MkMaxel b) _) =
-  let bSq = sum (map (\(_, w) => w * w) b)
+diracSpinorCurrent (MkMultivector s v b _) =
+  let bSq = foldBoxTreeL (\acc, (_, w) => acc + (w * w)) (intToBoxInt 0) (maxelToBoxTree b)
       j0  = (s * s) + bSq
       jV  = scaleVexel (intToBoxInt 2 * s) v
   in addVexel (MkVexel [(MkUnixel 0, j0)]) jV

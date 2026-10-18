@@ -1,6 +1,7 @@
 module Stage1.SubstrateMetricTensor
 
 import Stage0.BoxInt
+import Stage0.BoxNat
 import Stage0.StructuralFuel
 import Stage1.VexelMaxel
 import Data.List
@@ -14,16 +15,22 @@ import Stage1.FourGeometries
 -- 1. TRIANGULAR BOXINT & DEPENDENT SYMMETRIC TENSOR DEFINITION
 ------------------------------------------------------------------------
 
+||| Constructive triangular number computation T_n = n(n+1)/2 via Peano Nat.
+public export
+triangularNatFromNat : Nat -> Nat
+triangularNatFromNat 0 = 0
+triangularNatFromNat (S k) = (S k) + triangularNatFromNat k
+
 ||| Evaluates the exact triangular number T_n = n(n+1)/2 as Nat for vector indexing.
 public export
 triangularNat : BoxInt -> Nat
-triangularNat (MkBoxInt n) = integerToNat (div (n * (n + 1)) 2)
+triangularNat dim = triangularNatFromNat (boxToNat dim)
 
 ||| Evaluates the exact triangular number T_n = n(n+1)/2 over BoxInt.
 ||| Definitionally reduces during compile-time elaboration.
 public export
 triangularBoxInt : BoxInt -> BoxInt
-triangularBoxInt (MkBoxInt n) = MkBoxInt (div (n * (n + 1)) 2)
+triangularBoxInt dim = natToBoxInt (triangularNat dim)
 
 ||| Generic Symmetric Metric Tensor dependently indexed by its BoxInt dimension.
 ||| Eliminates hardcoding magic numbers in record names.
@@ -140,11 +147,12 @@ classifySector i j =
 ||| Linear component index calculation (1..T_n) for upper triangular entry (i, j).
 public export
 metricComponentIndex : (dim : BoxInt) -> Nat -> Nat -> Nat
-metricComponentIndex (MkBoxInt d) i j =
-  let i1 = minus i 1
+metricComponentIndex dim i j =
+  let d = boxToNat dim
+      i1 = minus i 1
       i2 = minus i 2
-      halfProd = half (i1 * i2)
-      rowOffset = minus (i1 * (integerToNat d)) halfProd
+      halfProd = fst (natHalfAndOdd (i1 * i2))
+      rowOffset = minus (i1 * d) halfProd
   in rowOffset + minus j i + 1
 
 ||| Constructs canonical parabolic metric where det = 0 and all entries = 1.
@@ -187,6 +195,6 @@ prfColorMetricComponentsIs6 = Refl
 public export
 auditSubstrateMetricTensorProof : Bool
 auditSubstrateMetricTensorProof =
-  (unwrapBox (determinant canonicalSubstrateMetric) == 0) &&
+  boxIsZero (determinant canonicalSubstrateMetric) &&
   (metricComponentIndex DimSubstrate 1 1 == 1) &&
   (metricComponentIndex DimSubstrate 10 10 == DarkMatterCapacity)

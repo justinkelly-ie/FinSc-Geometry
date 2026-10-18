@@ -41,8 +41,8 @@ record MultisetMetricTensor (dim : BoxInt) where
 ||| Smart constructor building canonical Parabolic Multiset Metric Tensor for any dimension dim.
 public export
 canonicalMultisetMetric : (dim : BoxInt) -> MultisetMetricTensor dim
-canonicalMultisetMetric (MkBoxInt d) =
-  let dimNat = integerToNat d
+canonicalMultisetMetric dim =
+  let dimNat = boxToNat dim
       pairs = [ MkBasisPair i j | i <- [1..dimNat], j <- [1..dimNat], i <= j ]
       m = foldl (\acc, p => insertBox p (intToBoxInt 1) acc) emptyBox pairs
   in MkMultisetMetricTensor m (intToBoxInt 0)
@@ -61,5 +61,5 @@ canonicalSubstrateMultisetMetric = canonicalMultisetMetric DimSubstrate
 public export
 auditMultisetMetricTensorProof : Bool
 auditMultisetMetricTensorProof =
-  unwrapBox (determinant canonicalSubstrateMultisetMetric) == 0
+  boxIsZero (determinant canonicalSubstrateMultisetMetric)
 

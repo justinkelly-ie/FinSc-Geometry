@@ -217,11 +217,13 @@ boxSpecQuadrance s1 s2 =
 ||| Q_Vexel(v1, v2) = sum_i (c1(i) - c2(i))^2.
 public export
 vexelQuadrance : Vexel -> Vexel -> BoxInt
-vexelQuadrance (MkVexel xs) (MkVexel ys) =
-  let allIndices = nub (map (unUnixel . fst) xs ++ map (unUnixel . fst) ys)
+vexelQuadrance v1 v2 =
+  let xs = terms v1
+      ys = terms v2
+      allIndices = nub (map (unUnixel . fst) xs ++ map (unUnixel . fst) ys)
       sqDiffs = map (\idx =>
-        let w1 = lookupUnixel (MkUnixel idx) (MkVexel xs)
-            w2 = lookupUnixel (MkUnixel idx) (MkVexel ys)
+        let w1 = lookupUnixel (MkUnixel idx) v1
+            w2 = lookupUnixel (MkUnixel idx) v2
             diff = w1 - w2
         in diff * diff) allIndices
   in foldl (+) (intToBoxInt 0) sqDiffs

@@ -132,14 +132,14 @@ hodgeDualPixel2To1 (MkPixel r c) = MkPixel c r
 ||| Combinatorial Hodge Duality mapping 1-Blade Edges to Dual 2-Blade Faces.
 public export
 combinatorialDual1To2 : Maxel -> Maxel
-combinatorialDual1To2 (MkMaxel ps) =
-  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel1To2 p, w)) ps))
+combinatorialDual1To2 m =
+  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel1To2 p, w)) (pixels m)))
 
 ||| Combinatorial Hodge Duality mapping 2-Blade Faces to Dual 1-Blade Edges.
 public export
 combinatorialDual2To1 : Maxel -> Maxel
-combinatorialDual2To1 (MkMaxel ps) =
-  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel2To1 p, w)) ps))
+combinatorialDual2To1 m =
+  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel2To1 p, w)) (pixels m)))
 
 ||| Proves that the double Hodge dual on 3D Euclidean space satisfies star(star(m)) == m.
 public export
@@ -188,10 +188,10 @@ yangMillsFaceCurvature conn pix loop =
 ||| [u, v] = sum u_a v_b [T_a, T_b] -> Vexel.
 public export
 lieBracketVexel : Vexel -> Vexel -> Vexel
-lieBracketVexel (MkVexel u) (MkVexel v) =
-  let terms = [ dihedronColorBracket (s1, w1) (s2, w2)
-              | (s1, w1) <- u, (s2, w2) <- v ]
-  in canonicalizeVexel (MkVexel terms)
+lieBracketVexel u v =
+  let termsList = [ dihedronColorBracket (s1, w1) (s2, w2)
+                  | (s1, w1) <- terms u, (s2, w2) <- terms v ]
+  in canonicalizeVexel (MkVexel termsList)
 
 ||| Proves that the multiset Lie bracket satisfies the Jacobi Identity:
 ||| [u, [v, w]] + [v, [w, u]] + [w, [u, v]] == 0.
