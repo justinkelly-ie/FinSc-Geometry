@@ -8,6 +8,7 @@ import public Stage0.LatticeTopology
 import public Stage1.ChromoCategory
 import public Stage1.CliffordAlgebra
 import public Stage1.ExclusionPrinciple
+import public Stage1.FanoOctonion
 import public Stage1.FourGeometriesActions
 import public Stage1.GrassmannCalculus
 import public Stage1.InformationGeometry
@@ -18,6 +19,7 @@ import public Stage1.MetricalBounds
 import public Stage1.MonadicMetricSpace
 import public Stage1.MotivicProof
 import public Stage1.MultisetMetricTensor
+import public Stage1.PentagonalFibonacci
 import public Stage1.QuantumTransition
 import public Stage1.RationalTrig
 import public Stage1.SpatialProjection
