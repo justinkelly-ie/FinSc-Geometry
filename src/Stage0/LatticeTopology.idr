@@ -5,7 +5,8 @@ import Stage0.Singleton.Bit
 import Stage0.BoxInt
 import Stage1.Order.Preorder
 import Stage1.ScaleTransform
-import Stage1.VexelMaxel
+import Stage1.Carrier.Boxel
+import Stage1.Basis.Coordinate
 import Stage1.LinAlgebra.TernaryClassifier
 import Stage0.NarayAlphabet
 import Data.Vect

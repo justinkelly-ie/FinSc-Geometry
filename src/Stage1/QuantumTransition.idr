@@ -2,7 +2,7 @@ module Stage1.QuantumTransition
 
 import Stage0.BoxInt
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Data.List
 import Data.Vect
@@ -179,7 +179,7 @@ phaseGateOp2 =
 public export
 adjointQuantumOp : QuantumOperator -> QuantumOperator
 adjointQuantumOp (MkQuantumOperator mat) =
-  let mapped = map (\(MkPixel r c, val) => (MkPixel c r, conjAmplitude val)) mat
+  let mapped = map (\(px, val) => (mkPixel (pixelCol px) (pixelRow px), conjAmplitude val)) mat
   in MkQuantumOperator mapped
 
 ||| Applies a QuantumOperator to a QuantumState: |psi'> = U |psi>.
@@ -187,9 +187,11 @@ adjointQuantumOp (MkQuantumOperator mat) =
 public export
 applyQuantumOperator : List Unixel -> QuantumOperator -> QuantumState -> QuantumState
 applyQuantumOperator basis op st =
-  let computed = map (\(sOut@(MkUnixel i)) =>
-                    let sumRow = sumAmplitudes (map (\(sIn@(MkUnixel j)) =>
-                                                  let u_ij = lookupMatrixEntry (MkPixel i j) op
+  let computed = map (\sOut =>
+                    let i = unwrapUnixel sOut
+                        sumRow = sumAmplitudes (map (\sIn =>
+                                                  let j = unwrapUnixel sIn
+                                                      u_ij = lookupMatrixEntry (mkPixel i j) op
                                                       c_j  = lookupStateAmplitude sIn st
                                                   in mulAmplitude u_ij c_j) basis)
                     in (sOut, sumRow)) basis
@@ -218,10 +220,7 @@ public export
 mulQuantumOp : (dim : Nat) -> QuantumOperator -> QuantumOperator -> QuantumOperator
 mulQuantumOp dim opA opB =
   let indices = natRange 1 dim
-      pixels = concatMap (\i => map (\k => MkPixel i k) indices) indices
-      entries = map (\pix@(MkPixel i k) =>
-                      let dotProd = sumDot indices i k
-                      in (pix, dotProd)) pixels
+      entries = concatMap (\i => map (\k => (mkPixel i k, sumDot indices i k)) indices) indices
   in MkQuantumOperator (filter (\(_, v) => v /= zeroAmplitude) entries)
   where
     sumDot : List Nat -> Nat -> Nat -> DualAmplitude

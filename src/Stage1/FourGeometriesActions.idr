@@ -7,7 +7,8 @@ import Data.Fuel
 import Data.Fin
 import public Stage0.BoxInt
 import public Stage1.Order.Preorder
-import public Stage1.VexelMaxel
+import public Stage1.Carrier.Maxel
+import public Stage1.Carrier.Vexel
 import public Stage1.UnixelFraction
 import public Stage1.ScaleTransform
 import public Stage1.FourGeometries
@@ -25,7 +26,7 @@ import public Stage1.LinAlgebra.TernaryClassifier
 ||| Maps each fundamental geometry to its canonical Maxel metric tensor.
 %inline
 public export
-geometryMetric : FundamentalGeometry -> Stage1.VexelMaxel.Maxel
+geometryMetric : FundamentalGeometry -> Maxel
 geometryMetric EllipticGeom   = gBlue
 geometryMetric HyperbolicGeom = gRed
 geometryMetric ParabolicGeom  = gBoole
@@ -106,12 +107,12 @@ parabolicDissipationAction v1 v2 = evaluateQuadrance ParabolicGeom v1 v2
 ||| Satisfies g22 = 0 (no temporal feedback) and g12 = 1 (unidirectional matter bias).
 %inline
 public export
-substrateCausalArrowAction : Stage1.VexelMaxel.Maxel -> Bool
+substrateCausalArrowAction : Maxel -> Bool
 substrateCausalArrowAction g =
   boxIsZero (g22 g) && g12 g == intToBoxInt 1
 
 public export
-substrateCausalArrowActionBit : Stage1.VexelMaxel.Maxel -> Bit
+substrateCausalArrowActionBit : Maxel -> Bit
 substrateCausalArrowActionBit g =
   if boxIsZero (g22 g) && g12 g == intToBoxInt 1 then One else Zero
 

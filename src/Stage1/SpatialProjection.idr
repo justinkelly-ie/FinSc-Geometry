@@ -12,9 +12,13 @@ import Data.Fuel
 public export
 record MaxelOperator where
   constructor MkMaxelOp
-  src : Int
-  tgt : Int
-  sec : GeometrySector
+  src      : Int
+  tgt      : Int
+  geometry : Geometry
+
+public export %deprecate
+sec : MaxelOperator -> Geometry
+sec op = op.geometry
 
 ------------------------------------------------------------------------
 -- 1. TOTAL FUELED SPATIAL BOXEL GRID PROJECTION ON T^3

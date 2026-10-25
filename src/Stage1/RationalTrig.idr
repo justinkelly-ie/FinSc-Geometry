@@ -1,7 +1,9 @@
 module Stage1.RationalTrig
 
 import Stage0.BoxInt
-import Stage1.VexelMaxel
+import Stage1.Carrier.Maxel
+import Stage1.Carrier.Vexel
+import Stage1.Basis.Coordinate
 import Stage0.Multiset
 import Stage1.UnixelFraction
 import Stage1.Polynumber
@@ -40,7 +42,7 @@ quadrea q1 q2 q3 = archimedesFunction q1 q2 q3
 ||| Constructs the 2x2 symmetric Gram Maxel of a triangle from its three side quadrances:
 ||| [[2*Q1, Q1 + Q2 - Q3], [Q1 + Q2 - Q3, 2*Q2]].
 public export
-gramMaxel : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> Stage1.VexelMaxel.Maxel
+gramMaxel : (q1 : BoxInt) -> (q2 : BoxInt) -> (q3 : BoxInt) -> Maxel
 gramMaxel q1 q2 q3 =
   let g11Val = intToBoxInt 2 * q1
       g12Val = (q1 + q2) - q3
@@ -75,7 +77,7 @@ isCollinearQuadrance q1 q2 q3 =
 ||| Emergence theorem from 2x2 maxels:
 ||| Evaluates the Gram determinant Archimedes formula: 4 * det(g) * (x1*y2 - x2*y1)^2
 public export
-archimedesFromMaxels : Stage1.VexelMaxel.Maxel -> BoxInt -> BoxInt -> BoxInt -> BoxInt -> BoxInt
+archimedesFromMaxels : Maxel -> BoxInt -> BoxInt -> BoxInt -> BoxInt -> BoxInt
 archimedesFromMaxels metric x1 y1 x2 y2 =
   let crossDet = (x1 * y2) - (x2 * y1)
       detG     = detMetric metric
@@ -89,10 +91,10 @@ archimedesFromMaxels metric x1 y1 x2 y2 =
 ||| Q(v1, v2) = (x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2
 public export
 quadrance3D : Voxel -> Voxel -> BoxInt
-quadrance3D (MkVoxel x1 y1 z1) (MkVoxel x2 y2 z2) =
-  let dx = (natToBoxInt x1) - (natToBoxInt x2)
-      dy = (natToBoxInt y1) - (natToBoxInt y2)
-      dz = (natToBoxInt z1) - (natToBoxInt z2)
+quadrance3D v1 v2 =
+  let dx = (natToBoxInt (voxelX v1)) - (natToBoxInt (voxelX v2))
+      dy = (natToBoxInt (voxelY v1)) - (natToBoxInt (voxelY v2))
+      dz = (natToBoxInt (voxelZ v1)) - (natToBoxInt (voxelZ v2))
   in (dx * dx) + (dy * dy) + (dz * dz)
 
 ||| Computes the exact Rational Spread s = sin^2(theta) between two lines
@@ -229,7 +231,7 @@ vexelQuadrance v1 v2 =
   in foldl (+) (intToBoxInt 0) sqDiffs
   where
     unUnixel : Unixel -> Nat
-    unUnixel (MkUnixel k) = k
+    unUnixel = unwrapUnixel
 
 ||| Computes the exact Rational Spread s = sin^2(theta) between three container quadrances Q1, Q2, Q3:
 ||| s = A(Q1, Q2, Q3) / (4 * Q1 * Q2) in UnixelFraction.
@@ -373,7 +375,7 @@ prfStagedQuadrea q1 q2 q3 = inverseSpliceQuote (quadrea q1 q2 q3)
 ||| with diagonal entry c11 = 2 * Q_Red = 2 * (x^2 - y^2) identically satisfying:
 ||| (2 * Q_Blue - 4 * y^2) == 2 * Q_Red.
 public export
-pythagoreanSpreadMaxel : (x : BoxInt) -> (y : BoxInt) -> Stage1.VexelMaxel.Maxel
+pythagoreanSpreadMaxel : (x : BoxInt) -> (y : BoxInt) -> Maxel
 pythagoreanSpreadMaxel x y =
   let qBlue = (x * x) + (y * y)
       qRed  = (x * x) - (y * y)
@@ -381,11 +383,11 @@ pythagoreanSpreadMaxel x y =
       c12   = mulBox (intToBoxInt (-1)) qBlue
       c21   = qBlue
       c22   = intToBoxInt 0
-  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
-                               , (MkPixel 1 2, c12)
-                               , (MkPixel 2 1, c21)
-                               , (MkPixel 2 2, c22)
-                               ]
+  in MkMaxel [ (MkPixel 1 1, c11)
+             , (MkPixel 1 2, c12)
+             , (MkPixel 2 1, c21)
+             , (MkPixel 2 2, c22)
+             ]
 
 ||| Static verification witness: Spread diagonal entry scaled by Q_Blue identically equals 2 * Q_Red.
 public export
@@ -401,17 +403,17 @@ auditSpreadDiagonalRatioProof x y =
 ||| [[2 - 4s, -1], [1, 0]].
 ||| Deprecated: Prefer exact integer `pythagoreanSpreadMaxel x y` to avoid fractional truncation.
 public export
-companionSpreadMaxel : (s : BoxInt) -> Stage1.VexelMaxel.Maxel
+companionSpreadMaxel : (s : BoxInt) -> Maxel
 companionSpreadMaxel s =
   let c11 = intToBoxInt 2 - (intToBoxInt 4 * s)
       c12 = intToBoxInt (-1)
       c21 = intToBoxInt 1
       c22 = intToBoxInt 0
-  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
-                               , (MkPixel 1 2, c12)
-                               , (MkPixel 2 1, c21)
-                               , (MkPixel 2 2, c22)
-                               ]
+  in MkMaxel [ (MkPixel 1 1, c11)
+             , (MkPixel 1 2, c12)
+             , (MkPixel 2 1, c21)
+             , (MkPixel 2 2, c22)
+             ]
 
 ||| Dimension-checked 2x2 Companion Spread SquareMaxel transfer matrix for dynamic coordinates (x, y):
 public export
@@ -481,17 +483,17 @@ evalNthCrossMultipleSpreadStream n s = subBox (intToBoxInt 1) (evalNthSpreadStre
 ||| Constructs the 2x2 Companion Maxel transfer matrix for multiple cross recurrence:
 ||| [[2(2c - 1), -1], [1, 0]].
 public export
-companionCrossMaxel : (c : BoxInt) -> Stage1.VexelMaxel.Maxel
+companionCrossMaxel : (c : BoxInt) -> Maxel
 companionCrossMaxel c =
   let c11 = intToBoxInt 2 * (intToBoxInt 2 * c - intToBoxInt 1)
       c12 = intToBoxInt (-1)
       c21 = intToBoxInt 1
       c22 = intToBoxInt 0
-  in Stage1.VexelMaxel.MkMaxel [ (MkPixel 1 1, c11)
-                               , (MkPixel 1 2, c12)
-                               , (MkPixel 2 1, c21)
-                               , (MkPixel 2 2, c22)
-                               ]
+  in MkMaxel [ (MkPixel 1 1, c11)
+             , (MkPixel 1 2, c12)
+             , (MkPixel 2 1, c21)
+             , (MkPixel 2 2, c22)
+             ]
 
 ||| Step function for unrolling the multiple cross recurrence sequence:
 ||| c_0 = 1, c_1 = c, c_{n+1} = 2(2c - 1)*c_n - c_{n-1} + 2(1 - c).

@@ -3,7 +3,6 @@ module Stage1.SubstrateMetricTensor
 import Stage0.BoxInt
 import Stage0.BoxNat
 import Stage0.StructuralFuel
-import Stage1.VexelMaxel
 import Data.List
 import Data.Vect
 

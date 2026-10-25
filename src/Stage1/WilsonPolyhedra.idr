@@ -1,7 +1,7 @@
 module Stage1.WilsonPolyhedra
 
 import Stage0.BoxInt
-import Stage1.VexelMaxel
+import Stage1.Basis.Coordinate
 import Stage1.UnixelFraction
 import Stage1.FourGeometries
 import Stage1.QuantumTransition

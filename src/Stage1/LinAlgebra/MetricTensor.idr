@@ -1,7 +1,8 @@
 module Stage1.LinAlgebra.MetricTensor
 
 import public Stage0.BoxInt
-import public Stage1.VexelMaxel
+import public Stage1.Carrier.Maxel
+import public Stage1.Basis.Coordinate
 
 %default total
 

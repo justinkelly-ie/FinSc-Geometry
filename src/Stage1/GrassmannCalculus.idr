@@ -2,7 +2,10 @@ module Stage1.GrassmannCalculus
 
 import Stage0.BoxInt
 import Stage0.Multiset
-import Stage1.VexelMaxel
+import Stage1.Carrier.Vexel
+import Stage1.Carrier.Maxel
+import Stage1.Carrier.Boxel
+import Stage1.Basis.Coordinate
 import Data.List
 import Data.Vect
 
@@ -53,11 +56,13 @@ lookupPoint s v = lookupUnixel s v
 ||| Supports antisymmetric orientation: [v, u] = - [u, v].
 public export
 lookupEdge : (Unixel, Unixel) -> Maxel -> BoxInt
-lookupEdge (MkUnixel u, MkUnixel v) m =
-  let direct = lookupPixel (MkPixel u v) m
+lookupEdge (u, v) m =
+  let uIdx = unwrapUnixel u
+      vIdx = unwrapUnixel v
+      direct = lookupPixel (mkPixel uIdx vIdx) m
   in if boxIsNonZero direct
        then direct
-       else let rev = lookupPixel (MkPixel v u) m
+       else let rev = lookupPixel (mkPixel vIdx uIdx) m
             in if boxIsNonZero rev
                  then -rev
                  else intToBoxInt 0
@@ -77,10 +82,10 @@ lookupCell v b = lookupVoxel v b
 public export
 grassmannCoboundary0 : List (Unixel, Unixel) -> Vexel -> Maxel
 grassmannCoboundary0 edges phi =
-  let computed = map (\(u@(MkUnixel uIdx), v@(MkUnixel vIdx)) => 
+  let computed = map (\(u, v) => 
                     let vu = lookupPoint u phi
                         vv = lookupPoint v phi
-                    in (MkPixel uIdx vIdx, vv - vu)) edges
+                    in (mkPixel (unwrapUnixel u) (unwrapUnixel v), vv - vu)) edges
   in canonicalizeMaxel (MkMaxel computed)
 
 ||| 1-Coboundary Operator d1 : Maxel -> Maxel (Discrete Curl / Curvature F = dA).
@@ -113,10 +118,14 @@ grassmannCoboundary2 voxels field =
 ||| star [3, 0] (dz) => [1, 2] (dx ^ dy)
 public export
 hodgeDualPixel1To2 : Pixel -> Pixel
-hodgeDualPixel1To2 (MkPixel 1 0) = MkPixel 2 3
-hodgeDualPixel1To2 (MkPixel 2 0) = MkPixel 3 1
-hodgeDualPixel1To2 (MkPixel 3 0) = MkPixel 1 2
-hodgeDualPixel1To2 (MkPixel r c) = MkPixel c r
+hodgeDualPixel1To2 px =
+  let r = pixelRow px
+      c = pixelCol px
+  in case (r, c) of
+       (1, 0) => mkPixel 2 3
+       (2, 0) => mkPixel 3 1
+       (3, 0) => mkPixel 1 2
+       _      => mkPixel c r
 
 ||| Maps a 2-Blade coordinate face back to its orthogonal 1-Blade edge:
 ||| star [2, 3] (dy ^ dz) => [1, 0] (dx)
@@ -124,10 +133,14 @@ hodgeDualPixel1To2 (MkPixel r c) = MkPixel c r
 ||| star [1, 2] (dx ^ dy) => [3, 0] (dz)
 public export
 hodgeDualPixel2To1 : Pixel -> Pixel
-hodgeDualPixel2To1 (MkPixel 2 3) = MkPixel 1 0
-hodgeDualPixel2To1 (MkPixel 3 1) = MkPixel 2 0
-hodgeDualPixel2To1 (MkPixel 1 2) = MkPixel 3 0
-hodgeDualPixel2To1 (MkPixel r c) = MkPixel c r
+hodgeDualPixel2To1 px =
+  let r = pixelRow px
+      c = pixelCol px
+  in case (r, c) of
+       (2, 3) => mkPixel 1 0
+       (3, 1) => mkPixel 2 0
+       (1, 2) => mkPixel 3 0
+       _      => mkPixel c r
 
 ||| Combinatorial Hodge Duality mapping 1-Blade Edges to Dual 2-Blade Faces.
 public export
@@ -159,13 +172,17 @@ auditHodgeStarInvolutionProof =
 ||| [T_Green, T_Red] = -T_Blue,   [T_Blue, T_Green] = -T_Red,   [T_Red, T_Blue] = -T_Green
 public export
 su3ColorBracket : Unixel -> Unixel -> (Unixel, BoxInt)
-su3ColorBracket (MkUnixel 1) (MkUnixel 2) = (MkUnixel 3, intToBoxInt 1)
-su3ColorBracket (MkUnixel 2) (MkUnixel 3) = (MkUnixel 1, intToBoxInt 1)
-su3ColorBracket (MkUnixel 3) (MkUnixel 1) = (MkUnixel 2, intToBoxInt 1)
-su3ColorBracket (MkUnixel 2) (MkUnixel 1) = (MkUnixel 3, intToBoxInt (-1))
-su3ColorBracket (MkUnixel 3) (MkUnixel 2) = (MkUnixel 1, intToBoxInt (-1))
-su3ColorBracket (MkUnixel 1) (MkUnixel 3) = (MkUnixel 2, intToBoxInt (-1))
-su3ColorBracket (MkUnixel a) _               = (MkUnixel a, intToBoxInt 0)
+su3ColorBracket u1 u2 =
+  let a = unwrapUnixel u1
+      b = unwrapUnixel u2
+  in case (a, b) of
+       (1, 2) => (mkUnixel 3, intToBoxInt 1)
+       (2, 3) => (mkUnixel 1, intToBoxInt 1)
+       (3, 1) => (mkUnixel 2, intToBoxInt 1)
+       (2, 1) => (mkUnixel 3, intToBoxInt (-1))
+       (3, 2) => (mkUnixel 1, intToBoxInt (-1))
+       (1, 3) => (mkUnixel 2, intToBoxInt (-1))
+       _      => (u1, intToBoxInt 0)
 
 ||| Evaluates Dihedron commutator bracket on weighted color singletons.
 public export
