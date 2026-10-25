@@ -87,15 +87,66 @@ archimedesFromMaxels metric x1 y1 x2 y2 =
 -- 2. 3D QUADRANCE & EXACT RATIONAL SPREADS
 ------------------------------------------------------------------------
 
+||| Exact squared distance between two natural numbers: (a - b)^2.
+public export
+natSqDist : Nat -> Nat -> Nat
+natSqDist a b =
+  let d = if a >= b then minus a b else minus b a
+  in d * d
+
+||| 2LTT Staged Universal Difference Quadrance across CoordCell coordinates.
+||| Emits branchless, flat Level 1 sums of squared differences for D in {1, 2, 3, 4}.
+public export
+stagedCellQuadranceDiff : (dim : Nat) -> Lift (CoordCell dim) -> Lift (CoordCell dim) -> Lift Nat
+stagedCellQuadranceDiff (S Z) qc1 qc2 =
+  quote (let c1 = splice qc1; c2 = splice qc2
+         in natSqDist (coordAxis 0 c1) (coordAxis 0 c2))
+stagedCellQuadranceDiff (S (S Z)) qc1 qc2 =
+  quote (let c1 = splice qc1; c2 = splice qc2
+         in natSqDist (coordAxis 0 c1) (coordAxis 0 c2) +
+            natSqDist (coordAxis 1 c1) (coordAxis 1 c2))
+stagedCellQuadranceDiff (S (S (S Z))) qc1 qc2 =
+  quote (let c1 = splice qc1; c2 = splice qc2
+         in natSqDist (coordAxis 0 c1) (coordAxis 0 c2) +
+            natSqDist (coordAxis 1 c1) (coordAxis 1 c2) +
+            natSqDist (coordAxis 2 c1) (coordAxis 2 c2))
+stagedCellQuadranceDiff (S (S (S (S Z)))) qc1 qc2 =
+  quote (let c1 = splice qc1; c2 = splice qc2
+         in natSqDist (coordAxis 0 c1) (coordAxis 0 c2) +
+            natSqDist (coordAxis 1 c1) (coordAxis 1 c2) +
+            natSqDist (coordAxis 2 c1) (coordAxis 2 c2) +
+            natSqDist (coordAxis 3 c1) (coordAxis 3 c2))
+stagedCellQuadranceDiff dim qc1 qc2 =
+  quote (let c1 = splice qc1; c2 = splice qc2
+             go : (fuel : Nat) -> Nat -> Nat -> Nat
+             go Z _ acc = acc
+             go (S f) axis acc =
+               if axis >= dim then acc
+               else go f (S axis) (acc + natSqDist (coordAxis axis c1) (coordAxis axis c2))
+         in go dim 0 0)
+
+||| Computes the exact coordinate Quadrance Q between two CoordCells of any dimension:
+||| Q(c1, c2) = sum_{axis=0}^{dim-1} (c1(axis) - c2(axis))^2
+public export
+cellQuadranceDiff : {dim : Nat} -> CoordCell dim -> CoordCell dim -> BoxInt
+cellQuadranceDiff {dim} c1 c2 =
+  natToBoxInt (splice (stagedCellQuadranceDiff dim (quote c1) (quote c2)))
+
 ||| Computes the exact 3D Quadrance Q between two coordinate Voxels:
 ||| Q(v1, v2) = (x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2
 public export
 quadrance3D : Voxel -> Voxel -> BoxInt
-quadrance3D v1 v2 =
-  let dx = (natToBoxInt (voxelX v1)) - (natToBoxInt (voxelX v2))
-      dy = (natToBoxInt (voxelY v1)) - (natToBoxInt (voxelY v2))
-      dz = (natToBoxInt (voxelZ v1)) - (natToBoxInt (voxelZ v2))
-  in (dx * dx) + (dy * dy) + (dz * dz)
+quadrance3D v1 v2 = cellQuadranceDiff {dim = 3} v1 v2
+
+||| Computes the exact 2D Quadrance Q between two coordinate Pixels:
+public export
+quadrance2D : Pixel -> Pixel -> BoxInt
+quadrance2D p1 p2 = cellQuadranceDiff {dim = 2} p1 p2
+
+||| Computes the exact 1D Quadrance Q between two coordinate Unixels:
+public export
+quadrance1D : Unixel -> Unixel -> BoxInt
+quadrance1D u1 u2 = cellQuadranceDiff {dim = 1} u1 u2
 
 ||| Computes the exact Rational Spread s = sin^2(theta) between two lines
 ||| meeting at a vertex in a triangle with side quadrances Q1, Q2, Q3 (Spread Law):
