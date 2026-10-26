@@ -514,10 +514,12 @@ auditSpreadRecurrenceStreamProof =
      (s3 == intToBoxInt 50) &&
      (f0 == s0) && (f1 == s1) && (f2 == s2) && (f3 == s3)
 
-||| Evaluates the n-th Cross Multiple Spread C_n(s) = 1 - S_n(s).
+||| Evaluates the n-th Cross Multiple Spread C_n(s) = 1 - S_n(s) using logarithmic O(log N) power when n > 3.
 public export
 evalNthCrossMultipleSpreadStream : (n : Nat) -> (s : BoxInt) -> BoxInt
-evalNthCrossMultipleSpreadStream n s = subBox (intToBoxInt 1) (evalNthSpreadStream n s)
+evalNthCrossMultipleSpreadStream n s =
+  let sn = if n > 3 then evalNthSpreadFast n s else evalNthSpreadStream n s
+  in subBox (intToBoxInt 1) sn
 
 ||| Constructs the 2x2 Companion Maxel transfer matrix for multiple cross recurrence:
 ||| [[2(2c - 1), -1], [1, 0]].
