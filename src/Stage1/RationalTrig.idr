@@ -3,8 +3,6 @@ module Stage1.RationalTrig
 import Stage0.BoxInt
 import Stage1.Basis.CoordCell
 import Stage1.Carrier.CellMultiset
-import Stage1.Carrier.Maxel
-import Stage1.Carrier.Vexel
 import Stage1.Basis.Coordinate
 import Stage0.Multiset
 import Stage1.UnixelFraction

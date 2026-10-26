@@ -1,7 +1,6 @@
 module Stage1.PentagonalFibonacci
 
 import Stage0.BoxInt
-import Stage1.Carrier.Maxel
 import Stage1.Basis.Coordinate
 import Stage1.MultisetTree
 import Stage0.PrimeMultiset

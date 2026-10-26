@@ -7,8 +7,7 @@ import Data.Fuel
 import Data.Fin
 import public Stage0.BoxInt
 import public Stage1.Order.Preorder
-import public Stage1.Carrier.Maxel
-import public Stage1.Carrier.Vexel
+import public Stage1.Basis.Coordinate
 import public Stage1.UnixelFraction
 import public Stage1.ScaleTransform
 import public Stage1.FourGeometries

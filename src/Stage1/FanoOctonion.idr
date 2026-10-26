@@ -1,7 +1,6 @@
 module Stage1.FanoOctonion
 
 import Stage0.BoxInt
-import Stage1.Carrier.Maxel
 import Stage1.Basis.Coordinate
 import Stage1.MultisetTree
 import Stage0.PrimeMultiset
