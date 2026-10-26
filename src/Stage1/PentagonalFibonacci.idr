@@ -24,7 +24,7 @@ fibonacciCompanionMaxel =
       tree1 = setBoxTree (MkPixel 0 1) (intToBoxInt 1) tree0
       tree2 = setBoxTree (MkPixel 1 0) (intToBoxInt 1) tree1
       tree3 = setBoxTree (MkPixel 1 1) (intToBoxInt 0) tree2
-  in MkBoxSquareMaxel tree3
+  in MkSquareMaxel tree3
 
 ||| Computes M_Fib^N using repeated matrix multiplication.
 public export
@@ -36,7 +36,7 @@ powerFibonacciMaxel (S k) =
 ||| Reads the element weight at pixel coordinate p in a BoxSquareMaxel.
 public export
 lookupBoxSquareMaxel : Pixel -> BoxSquareMaxel dim -> BoxInt
-lookupBoxSquareMaxel p (MkBoxSquareMaxel tree) = lookupBoxTree p tree
+lookupBoxSquareMaxel p (MkSquareMaxel tree) = lookupBoxTree p tree
 
 ||| Extracts the N-th Fibonacci number F_N from M_Fib^N at pixel (0, 1).
 public export
@@ -69,7 +69,7 @@ pentagonalPermutationMaxel =
       step acc (r, c) = setBoxTree (MkPixel r c) (intToBoxInt 1) acc
       edges = the (List (Nat, Nat)) [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
       tree = foldl step BoxLeaf edges
-  in MkBoxSquareMaxel tree
+  in MkSquareMaxel tree
 
 ||| Computes sigma_5^k cyclic shift matrix.
 public export

@@ -114,7 +114,7 @@ fanoIncidenceMaxel =
            then setBoxTree (MkPixel (fanoPointToNat p) lIdx) (intToBoxInt 1) acc
            else acc
       tree = foldl step BoxLeaf pairs
-  in MkBoxSquareMaxel tree
+  in MkSquareMaxel tree
 
 ||| 2LTT Staged compilation of the Fano incidence matrix at Level 1.
 public export
@@ -268,6 +268,6 @@ auditOctonionNonAssociativity =
 public export
 auditFanoIncidenceCount : Bool
 auditFanoIncidenceCount =
-  let MkBoxSquareMaxel tree = fanoIncidenceMaxel
+  let MkSquareMaxel tree = fanoIncidenceMaxel
       entries = boxTreeToList tree
   in length entries == 21
