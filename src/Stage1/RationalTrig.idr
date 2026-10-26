@@ -1,6 +1,8 @@
 module Stage1.RationalTrig
 
 import Stage0.BoxInt
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.Carrier.Maxel
 import Stage1.Carrier.Vexel
 import Stage1.Basis.Coordinate
@@ -434,11 +436,10 @@ pythagoreanSpreadMaxel x y =
       c12   = mulBox (intToBoxInt (-1)) qBlue
       c21   = qBlue
       c22   = intToBoxInt 0
-  in MkMaxel [ (MkPixel 1 1, c11)
-             , (MkPixel 1 2, c12)
-             , (MkPixel 2 1, c21)
-             , (MkPixel 2 2, c22)
-             ]
+  in singletonCell (mkPixel 1 1) c11 <+>
+     singletonCell (mkPixel 1 2) c12 <+>
+     singletonCell (mkPixel 2 1) c21 <+>
+     singletonCell (mkPixel 2 2) c22
 
 ||| Static verification witness: Spread diagonal entry scaled by Q_Blue identically equals 2 * Q_Red.
 public export
@@ -460,11 +461,10 @@ companionSpreadMaxel s =
       c12 = intToBoxInt (-1)
       c21 = intToBoxInt 1
       c22 = intToBoxInt 0
-  in MkMaxel [ (MkPixel 1 1, c11)
-             , (MkPixel 1 2, c12)
-             , (MkPixel 2 1, c21)
-             , (MkPixel 2 2, c22)
-             ]
+  in singletonCell (mkPixel 1 1) c11 <+>
+     singletonCell (mkPixel 1 2) c12 <+>
+     singletonCell (mkPixel 2 1) c21 <+>
+     singletonCell (mkPixel 2 2) c22
 
 ||| Dimension-checked 2x2 Companion Spread SquareMaxel transfer matrix for dynamic coordinates (x, y):
 public export
@@ -540,11 +540,10 @@ companionCrossMaxel c =
       c12 = intToBoxInt (-1)
       c21 = intToBoxInt 1
       c22 = intToBoxInt 0
-  in MkMaxel [ (MkPixel 1 1, c11)
-             , (MkPixel 1 2, c12)
-             , (MkPixel 2 1, c21)
-             , (MkPixel 2 2, c22)
-             ]
+  in singletonCell (mkPixel 1 1) c11 <+>
+     singletonCell (mkPixel 1 2) c12 <+>
+     singletonCell (mkPixel 2 1) c21 <+>
+     singletonCell (mkPixel 2 2) c22
 
 ||| Step function for unrolling the multiple cross recurrence sequence:
 ||| c_0 = 1, c_1 = c, c_{n+1} = 2(2c - 1)*c_n - c_{n-1} + 2(1 - c).

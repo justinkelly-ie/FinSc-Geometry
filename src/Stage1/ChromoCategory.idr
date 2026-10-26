@@ -1,8 +1,9 @@
 module Stage1.ChromoCategory
 
 import public Stage0.BoxInt
-import public Stage1.Carrier.Maxel
-import public Stage1.Carrier.Vexel
+import public Stage1.Basis.CoordCell
+import public Stage1.Carrier.CellMultiset
+import public Stage1.Basis.Coordinate
 import public Stage1.LinAlgebra.MetricTensor
 
 %default total

@@ -1,7 +1,8 @@
 module Stage1.LinAlgebra.TernaryClassifier
 
 import Stage0.BoxInt
-import Stage1.Carrier.Vexel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.Carrier.BalanceArray
 import Stage1.LinAlgebra.MetricTensor
 import Data.Vect

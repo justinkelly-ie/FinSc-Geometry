@@ -5,7 +5,8 @@ import Stage0.Singleton.Bit
 import Stage0.BoxInt
 import Stage1.Order.Preorder
 import Stage1.ScaleTransform
-import Stage1.Carrier.Boxel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.Basis.Coordinate
 import Stage1.LinAlgebra.TernaryClassifier
 import Stage0.NarayAlphabet
@@ -177,20 +178,20 @@ public export
 fin27ToVoxel : Fin 27 -> Voxel
 fin27ToVoxel idx =
   let (MkCoord3D x y z) = fin27ToCoord idx
-  in MkVoxel (ternaryNat x) (ternaryNat y) (ternaryNat z)
+  in mkVoxel (ternaryNat x) (ternaryNat y) (ternaryNat z)
 
 ||| Converts a flat 27-cell scalar field into a 3D Boxel multiset.
 public export
 field27ToBoxel : Vect 27 BoxInt -> Boxel
 field27ToBoxel grid =
   let paired = tabulate (\idx => (fin27ToVoxel idx, lookupCell idx grid))
-  in canonicalizeBoxel (MkBoxel (toList paired))
+  in foldl (\acc, (vox, w) => acc <+> singletonCell vox w) emptyCellMultiset paired
 
 ||| Converts a 3D Boxel multiset back into a flat 27-cell scalar field.
 public export
 boxelToField27 : Boxel -> Vect 27 BoxInt
 boxelToField27 b =
-  tabulate (\idx => lookupVoxel (fin27ToVoxel idx) b)
+  tabulate (\idx => lookupCellMultiset (fin27ToVoxel idx) b)
 
 ||| Computes the Discrete 3D Laplacian field directly on a Boxel multiset.
 public export
@@ -204,7 +205,7 @@ discreteLaplacianBoxel b =
 public export
 auditToroidalBoxelFluxProof : Boxel -> Bool
 auditToroidalBoxelFluxProof b =
-  totalBoxelWeight (discreteLaplacianBoxel b) == intToBoxInt 0
+  totalCellMultisetWeight (discreteLaplacianBoxel b) == intToBoxInt 0
 
 public export
 ScaleTransform Coord3D Nat where

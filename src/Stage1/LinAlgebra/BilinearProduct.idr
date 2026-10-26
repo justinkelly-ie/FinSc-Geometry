@@ -1,7 +1,8 @@
 module Stage1.LinAlgebra.BilinearProduct
 
 import Stage0.BoxInt
-import Stage1.Carrier.Maxel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.LinAlgebra.MetricTensor
 import Stage1.Math.Infinitesimal
 

@@ -1,7 +1,8 @@
 module Stage1.LinAlgebra.MetricTensor
 
 import public Stage0.BoxInt
-import public Stage1.Carrier.Maxel
+import public Stage1.Basis.CoordCell
+import public Stage1.Carrier.CellMultiset
 import public Stage1.Basis.Coordinate
 
 %default total
@@ -10,26 +11,25 @@ import public Stage1.Basis.Coordinate
 public export
 buildMetricMaxel : (g11 : BoxInt) -> (g12 : BoxInt) -> (g22 : BoxInt) -> Maxel
 buildMetricMaxel a b c =
-  MkMaxel [ (MkPixel 1 1, a)
-          , (MkPixel 1 2, b)
-          , (MkPixel 2 1, b)
-          , (MkPixel 2 2, c)
-          ]
+  singletonCell (mkPixel 1 1) a <+>
+  singletonCell (mkPixel 1 2) b <+>
+  singletonCell (mkPixel 2 1) b <+>
+  singletonCell (mkPixel 2 2) c
 
 ||| Extract g11 component from a Maxel.
 public export
 g11 : Maxel -> BoxInt
-g11 m = lookupPixel (MkPixel 1 1) m
+g11 m = lookupCellMultiset (mkPixel 1 1) m
 
 ||| Extract g12 component from a Maxel.
 public export
 g12 : Maxel -> BoxInt
-g12 m = lookupPixel (MkPixel 1 2) m
+g12 m = lookupCellMultiset (mkPixel 1 2) m
 
 ||| Extract g22 component from a Maxel.
 public export
 g22 : Maxel -> BoxInt
-g22 m = lookupPixel (MkPixel 2 2) m
+g22 m = lookupCellMultiset (mkPixel 2 2) m
 
 ||| Metric Determinant: det(M) = g11 * g22 - g12^2
 %inline public export

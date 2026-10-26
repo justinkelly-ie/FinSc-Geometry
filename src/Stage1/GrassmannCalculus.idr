@@ -2,10 +2,10 @@ module Stage1.GrassmannCalculus
 
 import Stage0.BoxInt
 import Stage0.Multiset
-import Stage1.Carrier.Vexel
-import Stage1.Carrier.Maxel
-import Stage1.Carrier.Boxel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.Basis.Coordinate
+import Stage1.MultisetTree
 import Data.List
 import Data.Vect
 
@@ -50,7 +50,7 @@ CellCochain = Boxel
 ||| Helper lookup for vertex point values in a PointCochain (Vexel).
 public export
 lookupPoint : Unixel -> Vexel -> BoxInt
-lookupPoint s v = lookupUnixel s v
+lookupPoint s v = lookupCellMultiset s v
 
 ||| Helper lookup for edge connection values in an EdgeCochain (Maxel).
 ||| Supports antisymmetric orientation: [v, u] = - [u, v].
@@ -59,10 +59,10 @@ lookupEdge : (Unixel, Unixel) -> Maxel -> BoxInt
 lookupEdge (u, v) m =
   let uIdx = unwrapUnixel u
       vIdx = unwrapUnixel v
-      direct = lookupPixel (mkPixel uIdx vIdx) m
+      direct = lookupCellMultiset (mkPixel uIdx vIdx) m
   in if boxIsNonZero direct
        then direct
-       else let rev = lookupPixel (mkPixel vIdx uIdx) m
+       else let rev = lookupCellMultiset (mkPixel vIdx uIdx) m
             in if boxIsNonZero rev
                  then -rev
                  else intToBoxInt 0
@@ -70,43 +70,43 @@ lookupEdge (u, v) m =
 ||| Helper lookup for face curvature values in a FaceCochain (Maxel).
 public export
 lookupFace : Pixel -> Maxel -> BoxInt
-lookupFace p m = lookupPixel p m
+lookupFace p m = lookupCellMultiset p m
 
 ||| Helper lookup for 3D cell density values in a CellCochain (Boxel).
 public export
 lookupCell : Voxel -> Boxel -> BoxInt
-lookupCell v b = lookupVoxel v b
+lookupCell v b = lookupCellMultiset v b
 
 ||| 0-Coboundary Operator d0 : Vexel -> Maxel (Discrete Gradient).
 ||| Evaluates difference of potential across directed edge [u -> v]: (Phi_v - Phi_u).
 public export
 grassmannCoboundary0 : List (Unixel, Unixel) -> Vexel -> Maxel
 grassmannCoboundary0 edges phi =
-  let computed = map (\(u, v) => 
-                    let vu = lookupPoint u phi
-                        vv = lookupPoint v phi
-                    in (mkPixel (unwrapUnixel u) (unwrapUnixel v), vv - vu)) edges
-  in canonicalizeMaxel (MkMaxel computed)
+  foldl (\acc, (u, v) =>
+    let vu = lookupPoint u phi
+        vv = lookupPoint v phi
+    in acc <+> singletonCell (mkPixel (unwrapUnixel u) (unwrapUnixel v)) (vv - vu)
+  ) emptyCellMultiset edges
 
 ||| 1-Coboundary Operator d1 : Maxel -> Maxel (Discrete Curl / Curvature F = dA).
 ||| Evaluates circulation along 4-edge boundary loop of each face: A_12 + A_23 + A_34 + A_41.
 public export
 grassmannCoboundary1 : List (Pixel, Vect 4 (Unixel, Unixel)) -> Maxel -> Maxel
 grassmannCoboundary1 faces conn =
-  let computed = map (\(pix, loop) =>
-                    let loopSum = sum (map (\e => lookupEdge e conn) (toList loop))
-                    in (pix, loopSum)) faces
-  in canonicalizeMaxel (MkMaxel computed)
+  foldl (\acc, (pix, loop) =>
+    let loopSum = sum (map (\e => lookupEdge e conn) (toList loop))
+    in acc <+> singletonCell pix loopSum
+  ) emptyCellMultiset faces
 
 ||| 2-Coboundary Operator d2 : Maxel -> Boxel (Discrete Divergence / Bianchi dF).
 ||| Evaluates closed boundary flux across the 6 faces bounding each 3D Voxel.
 public export
 grassmannCoboundary2 : List (Voxel, Vect 6 (Pixel, BoxInt)) -> Maxel -> Boxel
 grassmannCoboundary2 voxels field =
-  let computed = map (\(vox, bndFaces) =>
-                    let fluxSum = sum (map (\(pix, sign) => sign * lookupFace pix field) (toList bndFaces))
-                    in (vox, fluxSum)) voxels
-  in canonicalizeBoxel (MkBoxel computed)
+  foldl (\acc, (vox, bndFaces) =>
+    let fluxSum = sum (map (\(pix, sign) => sign * lookupFace pix field) (toList bndFaces))
+    in acc <+> singletonCell vox fluxSum
+  ) emptyCellMultiset voxels
 
 ------------------------------------------------------------------------
 -- 3. COMBINATORIAL HODGE STAR DUALITY (star : C_k <-> C_{3-k})
@@ -146,19 +146,19 @@ hodgeDualPixel2To1 px =
 public export
 combinatorialDual1To2 : Maxel -> Maxel
 combinatorialDual1To2 m =
-  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel1To2 p, w)) (pixels m)))
+  foldBoxTreeL (\acc, (p, w) => acc <+> singletonCell (hodgeDualPixel1To2 p) w) emptyCellMultiset m
 
 ||| Combinatorial Hodge Duality mapping 2-Blade Faces to Dual 1-Blade Edges.
 public export
 combinatorialDual2To1 : Maxel -> Maxel
 combinatorialDual2To1 m =
-  canonicalizeMaxel (MkMaxel (map (\(p, w) => (hodgeDualPixel2To1 p, w)) (pixels m)))
+  foldBoxTreeL (\acc, (p, w) => acc <+> singletonCell (hodgeDualPixel2To1 p) w) emptyCellMultiset m
 
 ||| Proves that the double Hodge dual on 3D Euclidean space satisfies star(star(m)) == m.
 public export
 auditHodgeStarInvolutionProof : Bool
 auditHodgeStarInvolutionProof =
-  let edgeField = MkMaxel [(MkPixel 1 0, intToBoxInt 5), (MkPixel 2 0, intToBoxInt 7)]
+  let edgeField = singletonCell (mkPixel 1 0) (intToBoxInt 5) <+> singletonCell (mkPixel 2 0) (intToBoxInt 7)
       faceField = combinatorialDual1To2 edgeField
       backEdge  = combinatorialDual2To1 faceField
   in backEdge == edgeField
@@ -198,7 +198,7 @@ yangMillsFaceCurvature conn pix loop =
   let abelianCurv = sum (map (\e => lookupEdge e conn) (toList loop))
       e1Val = lookupEdge (index 0 loop) conn
       e2Val = lookupEdge (index 1 loop) conn
-      (_, bracketVal) = dihedronColorBracket (MkUnixel 1, e1Val) (MkUnixel 2, e2Val)
+      (_, bracketVal) = dihedronColorBracket (mkUnixel 1, e1Val) (mkUnixel 2, e2Val)
   in abelianCurv + bracketVal
 
 ||| Evaluates the bilinear Lie bracket of two color generator Vexels:
@@ -206,23 +206,26 @@ yangMillsFaceCurvature conn pix loop =
 public export
 lieBracketVexel : Vexel -> Vexel -> Vexel
 lieBracketVexel u v =
-  let termsList = [ dihedronColorBracket (s1, w1) (s2, w2)
-                  | (s1, w1) <- terms u, (s2, w2) <- terms v ]
-  in canonicalizeVexel (MkVexel termsList)
+  foldBoxTreeL (\accU, (s1, w1) =>
+    foldBoxTreeL (\accV, (s2, w2) =>
+      let (sOut, sign) = su3ColorBracket s1 s2
+      in accV <+> singletonCell sOut (sign * w1 * w2)
+    ) accU v
+  ) emptyCellMultiset u
 
 ||| Proves that the multiset Lie bracket satisfies the Jacobi Identity:
 ||| [u, [v, w]] + [v, [w, u]] + [w, [u, v]] == 0.
 public export
 auditJacobiIdentityProof : Bool
 auditJacobiIdentityProof =
-  let u = MkVexel [(MkUnixel 1, intToBoxInt 1)] -- Red generator
-      v = MkVexel [(MkUnixel 2, intToBoxInt 1)] -- Green generator
-      w = MkVexel [(MkUnixel 3, intToBoxInt 1)] -- Blue generator
+  let u = singletonCell (mkUnixel 1) (intToBoxInt 1) -- Red generator
+      v = singletonCell (mkUnixel 2) (intToBoxInt 1) -- Green generator
+      w = singletonCell (mkUnixel 3) (intToBoxInt 1) -- Blue generator
       j1 = lieBracketVexel u (lieBracketVexel v w) -- [R, [G, B]] = [R, R] = 0
       j2 = lieBracketVexel v (lieBracketVexel w u) -- [G, [B, R]] = [G, G] = 0
       j3 = lieBracketVexel w (lieBracketVexel u v) -- [B, [R, G]] = [B, B] = 0
-      totalJacobi = addVexel j1 (addVexel j2 j3)
-  in totalJacobi == MkVexel []
+      totalJacobi = addCellMultiset j1 (addCellMultiset j2 j3)
+  in totalJacobi == neutral
 
 ||| Validates that total color flux across a closed 3D voxel boundary is identically zero (Color Singlet Confinement).
 public export

@@ -1,9 +1,8 @@
 module Stage1.CliffordAlgebra
 
 import Stage0.BoxInt
-import Stage1.Carrier.Vexel
-import Stage1.Carrier.Maxel
-import Stage1.Carrier.Boxel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.Basis.Coordinate
 import Stage1.MultisetTree
 import Stage1.LinAlgebra.BilinearProduct
@@ -38,25 +37,25 @@ Show Multivector where
 public export
 zeroMultivector : Multivector
 zeroMultivector =
-  MkMultivector (intToBoxInt 0) (MkVexel []) (MkMaxel []) (MkBoxel [])
+  MkMultivector (intToBoxInt 0) emptyCellMultiset emptyCellMultiset emptyCellMultiset
 
 ||| Embeds a pure scalar into a Multivector.
 public export
 scalarMultivector : BoxInt -> Multivector
 scalarMultivector s =
-  MkMultivector s (MkVexel []) (MkMaxel []) (MkBoxel [])
+  MkMultivector s emptyCellMultiset emptyCellMultiset emptyCellMultiset
 
 ||| Embeds a pure vector Vexel into a Multivector.
 public export
 vectorMultivector : Vexel -> Multivector
 vectorMultivector v =
-  MkMultivector (intToBoxInt 0) v (MkMaxel []) (MkBoxel [])
+  MkMultivector (intToBoxInt 0) v emptyCellMultiset emptyCellMultiset
 
 ||| Embeds a pure bivector Maxel into a Multivector.
 public export
 bivectorMultivector : Maxel -> Multivector
 bivectorMultivector b =
-  MkMultivector (intToBoxInt 0) (MkVexel []) b (MkBoxel [])
+  MkMultivector (intToBoxInt 0) emptyCellMultiset b emptyCellMultiset
 
 ------------------------------------------------------------------------
 -- 2. GEOMETRIC PRODUCT: uv = <u, v> 1 + (u ^ v)
@@ -69,14 +68,14 @@ mulGeometricVector : Maxel -> Vexel -> Vexel -> Multivector
 mulGeometricVector metric u v =
   let inner = metricInnerVexel metric u v
       outer = wedgeVexel u v
-  in MkMultivector inner (MkVexel []) outer (MkBoxel [])
+  in MkMultivector inner emptyCellMultiset outer emptyCellMultiset
 
 ||| Reversion (dagger) operator on Multivectors:
 ||| Reverses the order of blade factors: (e_i e_j)^\dagger = e_j e_i = -e_i e_j.
 public export
 reverseMultivector : Multivector -> Multivector
 reverseMultivector (MkMultivector s v b t) =
-  MkMultivector s v (scaleMaxel (intToBoxInt (-1)) b) (scaleBoxel (intToBoxInt (-1)) t)
+  MkMultivector s v (scaleCellMultiset (intToBoxInt (-1)) b) (scaleCellMultiset (intToBoxInt (-1)) t)
 
 ------------------------------------------------------------------------
 -- 3. ROTORS & HYPERPLANE REFLECTIONS
@@ -91,8 +90,8 @@ reflectVector metric n v =
       nDotN = metricInnerVexel metric n n
       denom = if boxIsZero nDotN then intToBoxInt 1 else nDotN
       scaleFactor = (intToBoxInt 2 * vDotN) `div` denom
-      scaledN = scaleVexel scaleFactor n
-  in subVexel v scaledN
+      scaledN = scaleCellMultiset scaleFactor n
+  in subCellMultiset v scaledN
 
 
 ||| Pure evaluator verifying that the square of any vector in Geometric Algebra
@@ -112,10 +111,10 @@ auditCliffordGeometricProductProof =
 public export
 diracSpinorCurrent : Multivector -> Vexel
 diracSpinorCurrent (MkMultivector s v b _) =
-  let bSq = foldBoxTreeL (\acc, (_, w) => acc + (w * w)) (intToBoxInt 0) (maxelToBoxTree b)
+  let bSq = foldBoxTreeL (\acc, (_, w) => acc + (w * w)) (intToBoxInt 0) b
       j0  = (s * s) + bSq
-      jV  = scaleVexel (intToBoxInt 2 * s) v
-  in addVexel (MkVexel [(MkUnixel 0, j0)]) jV
+      jV  = scaleCellMultiset (intToBoxInt 2 * s) v
+  in singletonCell (mkUnixel 0) j0 <+> jV
 
 ||| Audits that the discrete Dirac current divergence across closed bounding faces vanishes identically.
 public export

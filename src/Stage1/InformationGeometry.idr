@@ -3,8 +3,8 @@ module Stage1.InformationGeometry
 import Stage0.BoxInt
 import Stage1.Order.Preorder
 import Stage0.Multiset
-import Stage1.Carrier.Maxel
-import Stage1.Carrier.Boxel
+import Stage1.Basis.CoordCell
+import Stage1.Carrier.CellMultiset
 import Stage1.UnixelFraction
 import Stage1.CliffordAlgebra
 import Stage1.LinAlgebra.MetricTensor
