@@ -271,18 +271,8 @@ boxSpecQuadrance s1 s2 =
 public export
 vexelQuadrance : Vexel -> Vexel -> BoxInt
 vexelQuadrance v1 v2 =
-  let xs = terms v1
-      ys = terms v2
-      allIndices = nub (map (unUnixel . fst) xs ++ map (unUnixel . fst) ys)
-      sqDiffs = map (\idx =>
-        let w1 = lookupUnixel (MkUnixel idx) v1
-            w2 = lookupUnixel (MkUnixel idx) v2
-            diff = w1 - w2
-        in diff * diff) allIndices
-  in foldl (+) (intToBoxInt 0) sqDiffs
-  where
-    unUnixel : Unixel -> Nat
-    unUnixel = unwrapUnixel
+  let diffV = subCellMultiset v1 v2
+  in foldBoxTreeL (\acc, (_, w) => acc + (w * w)) (intToBoxInt 0) diffV
 
 ||| Computes the exact Rational Spread s = sin^2(theta) between three container quadrances Q1, Q2, Q3:
 ||| s = A(Q1, Q2, Q3) / (4 * Q1 * Q2) in UnixelFraction.
