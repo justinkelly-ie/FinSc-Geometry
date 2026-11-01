@@ -412,22 +412,27 @@ prfStagedQuadrea q1 q2 q3 = inverseSpliceQuote (quadrea q1 q2 q3)
 
 ||| Constructs the exact integer Companion Spread Maxel transfer matrix for dynamic coordinates (x, y):
 ||| [[2 * Q_Red, -Q_Blue], [Q_Blue, 0]].
-||| This represents the unnormalized 2x2 companion spread matrix scaled by Q_Blue = x^2 + y^2,
-||| with diagonal entry c11 = 2 * Q_Red = 2 * (x^2 - y^2) identically satisfying:
+||| Dynamic Companion Spread Maxel parameterized across arbitrary basis coordinates (i, j):
+||| Scaled by Q_Blue = x^2 + y^2, with diagonal entry c_ii = 2 * Q_Red = 2 * (x^2 - y^2) identically satisfying:
 ||| (2 * Q_Blue - 4 * y^2) == 2 * Q_Red.
 public export
-pythagoreanSpreadMaxel : (x : BoxInt) -> (y : BoxInt) -> Maxel
-pythagoreanSpreadMaxel x y =
+pythagoreanSpreadMaxelAt : (i : Nat) -> (j : Nat) -> (x : BoxInt) -> (y : BoxInt) -> Maxel
+pythagoreanSpreadMaxelAt i j x y =
   let qBlue = (x * x) + (y * y)
       qRed  = (x * x) - (y * y)
       c11   = intToBoxInt 2 * qRed
       c12   = mulBox (intToBoxInt (-1)) qBlue
       c21   = qBlue
       c22   = intToBoxInt 0
-  in singletonCell (mkPixel 1 1) c11 <+>
-     singletonCell (mkPixel 1 2) c12 <+>
-     singletonCell (mkPixel 2 1) c21 <+>
-     singletonCell (mkPixel 2 2) c22
+  in singletonCell (mkPixel i i) c11 <+>
+     singletonCell (mkPixel i j) c12 <+>
+     singletonCell (mkPixel j i) c21 <+>
+     singletonCell (mkPixel j j) c22
+
+||| Canonical 2x2 companion spread matrix on standard basis coordinates (1, 2).
+public export
+pythagoreanSpreadMaxel : (x : BoxInt) -> (y : BoxInt) -> Maxel
+pythagoreanSpreadMaxel = pythagoreanSpreadMaxelAt 1 2
 
 ||| Static verification witness: Spread diagonal entry scaled by Q_Blue identically equals 2 * Q_Red.
 public export
