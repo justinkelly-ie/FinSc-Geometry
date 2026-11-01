@@ -95,7 +95,7 @@ pointOnLine p (MkFanoLine a b c) = p == a || p == b || p == c
 ||| M_{p, l} = 1 if point p is incident to line l, else 0.
 ||| Supported on exactly 21 active non-zero pixels (3 points * 7 lines).
 public export
-fanoIncidenceMaxel : BoxSquareMaxel 7
+fanoIncidenceMaxel : SquareMaxel 7
 fanoIncidenceMaxel =
   let pts = toList allFanoPoints
       indexedLines : List (Nat, FanoLine)
@@ -118,7 +118,7 @@ fanoIncidenceMaxel =
 
 ||| 2LTT Staged compilation of the Fano incidence matrix at Level 1.
 public export
-stagedFanoIncidenceMaxel : Code (BoxSquareMaxel 7)
+stagedFanoIncidenceMaxel : Code (SquareMaxel 7)
 stagedFanoIncidenceMaxel = quote fanoIncidenceMaxel
 
 ------------------------------------------------------------------------

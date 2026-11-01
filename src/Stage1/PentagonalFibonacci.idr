@@ -18,7 +18,7 @@ import Data.Vect
 ||| M_Fib = [[1, 1], [1, 0]]
 ||| Satisfies M_Fib^N = [[F_{N+1}, F_N], [F_N, F_{N-1}]].
 public export
-fibonacciCompanionMaxel : BoxSquareMaxel 2
+fibonacciCompanionMaxel : SquareMaxel 2
 fibonacciCompanionMaxel =
   let tree0 = setBoxTree (MkPixel 0 0) (intToBoxInt 1) BoxLeaf
       tree1 = setBoxTree (MkPixel 0 1) (intToBoxInt 1) tree0
@@ -28,21 +28,21 @@ fibonacciCompanionMaxel =
 
 ||| Computes M_Fib^N using repeated matrix multiplication.
 public export
-powerFibonacciMaxel : Nat -> BoxSquareMaxel 2
-powerFibonacciMaxel 0 = identityBoxSquareMaxel 2
+powerFibonacciMaxel : Nat -> SquareMaxel 2
+powerFibonacciMaxel 0 = identitySquareMaxel 2
 powerFibonacciMaxel (S k) =
-  mulBoxSquareMaxel fibonacciCompanionMaxel (powerFibonacciMaxel k)
+  mulSquareMaxel fibonacciCompanionMaxel (powerFibonacciMaxel k)
 
-||| Reads the element weight at pixel coordinate p in a BoxSquareMaxel.
+||| Reads the element weight at pixel coordinate p in a SquareMaxel.
 public export
-lookupBoxSquareMaxel : Pixel -> BoxSquareMaxel dim -> BoxInt
-lookupBoxSquareMaxel p (MkSquareMaxel tree) = lookupBoxTree p tree
+lookupSquareMaxel : Pixel -> SquareMaxel dim -> BoxInt
+lookupSquareMaxel p (MkSquareMaxel tree) = lookupBoxTree p tree
 
 ||| Extracts the N-th Fibonacci number F_N from M_Fib^N at pixel (0, 1).
 public export
 fibonacciNumber : Nat -> BoxInt
 fibonacciNumber n =
-  lookupBoxSquareMaxel (MkPixel 0 1) (powerFibonacciMaxel n)
+  lookupSquareMaxel (MkPixel 0 1) (powerFibonacciMaxel n)
 
 ||| Extracts the exact constructivist Stern-Brocot rational convergent of the Golden Ratio:
 ||| phi_N = F_{N+1} / F_N as an exact UnixelFraction.
@@ -63,7 +63,7 @@ goldenRatioConvergent n =
 ||| sigma_5 : (0 -> 1 -> 2 -> 3 -> 4 -> 0).
 ||| Supported on exactly 5 active non-zero pixels in a 5x5 matrix.
 public export
-pentagonalPermutationMaxel : BoxSquareMaxel 5
+pentagonalPermutationMaxel : SquareMaxel 5
 pentagonalPermutationMaxel =
   let step : BoxMultisetTree Pixel -> (Nat, Nat) -> BoxMultisetTree Pixel
       step acc (r, c) = setBoxTree (MkPixel r c) (intToBoxInt 1) acc
@@ -73,10 +73,10 @@ pentagonalPermutationMaxel =
 
 ||| Computes sigma_5^k cyclic shift matrix.
 public export
-powerPentagonalMaxel : Nat -> BoxSquareMaxel 5
-powerPentagonalMaxel 0 = identityBoxSquareMaxel 5
+powerPentagonalMaxel : Nat -> SquareMaxel 5
+powerPentagonalMaxel 0 = identitySquareMaxel 5
 powerPentagonalMaxel (S k) =
-  mulBoxSquareMaxel pentagonalPermutationMaxel (powerPentagonalMaxel k)
+  mulSquareMaxel pentagonalPermutationMaxel (powerPentagonalMaxel k)
 
 ------------------------------------------------------------------------
 -- 3. 2LTT STAGED FIBONACCI STEPPING & COMPILED CLOSURE
@@ -85,13 +85,13 @@ powerPentagonalMaxel (S k) =
 ||| 2LTT Staged Fibonacci Matrix:
 ||| Pre-computes M_Fib^N at compile time (Level 1) into an exact runtime constant (Level 0).
 public export
-stagedFibonacciMaxel : (n : Nat) -> Code (BoxSquareMaxel 2)
+stagedFibonacciMaxel : (n : Nat) -> Code (SquareMaxel 2)
 stagedFibonacciMaxel n = quote (powerFibonacciMaxel n)
 
 ||| 2LTT Staged 5-Cycle Closure:
 ||| Quotes the compile-time identity closure sigma_5^5 = I_5.
 public export
-stagedPentagonalClosure : Code (BoxSquareMaxel 5)
+stagedPentagonalClosure : Code (SquareMaxel 5)
 stagedPentagonalClosure = quote (powerPentagonalMaxel 5)
 
 ------------------------------------------------------------------------
@@ -115,7 +115,7 @@ auditFibonacciSequence =
 public export
 auditPentagonal5CycleClosure : Bool
 auditPentagonal5CycleClosure =
-  splice stagedPentagonalClosure == identityBoxSquareMaxel 5
+  splice stagedPentagonalClosure == identitySquareMaxel 5
 
 ||| Verified Invariant: Golden ratio convergent phi_7 = 21 / 13 on the 13-smooth horizon.
 public export
