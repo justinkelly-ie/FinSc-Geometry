@@ -376,6 +376,32 @@ auditThreeFoldChromogeometryProof =
                                            (intToBoxInt 0) (intToBoxInt 3)
   in t6Ok && t8Ok
 
+||| Substrate Quadrance for displacement (dx, dy): Q_Substrate = dx^2 + 2*dx*dy.
+public export
+substrateQuadrance : (dx : BoxInt) -> (dy : BoxInt) -> BoxInt
+substrateQuadrance dx dy =
+  (dx * dx) + intToBoxInt 2 * (dx * dy)
+
+||| 4-Geometry Constructivist Quadrance Symmetry:
+||| 2 * Q_Substrate == Q_Blue + Q_Red + 2 * Q_Green.
+public export
+evaluateFourFoldQuadranceSymmetry : (dx : BoxInt) -> (dy : BoxInt) -> Bool
+evaluateFourFoldQuadranceSymmetry dx dy =
+  let qb = (dx * dx) + (dy * dy)
+      qr = (dx * dx) - (dy * dy)
+      qg = intToBoxInt 2 * (dx * dy)
+      qs = substrateQuadrance dx dy
+      lhs = intToBoxInt 2 * qs
+      rhs = qb + qr + intToBoxInt 2 * qg
+  in lhs == rhs
+
+||| Audits 4-Fold Chromogeometry including Substrate Quadrance Symmetry.
+public export
+auditFourFoldChromogeometryProof : Bool
+auditFourFoldChromogeometryProof =
+  auditThreeFoldChromogeometryProof &&
+  evaluateFourFoldQuadranceSymmetry (intToBoxInt 3) (intToBoxInt 4)
+
 ||| 2LTT Path Equality reflecting inner Quadrea manifold path to outer strict equality.
 public export
 0 reflectQuadreaPathToStrict : (q1, q2, q3 : BoxInt) ->
