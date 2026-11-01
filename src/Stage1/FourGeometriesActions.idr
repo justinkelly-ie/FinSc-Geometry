@@ -13,6 +13,7 @@ import public Stage1.ScaleTransform
 import public Stage1.FourGeometries
 import public Stage1.LinAlgebra.MetricTensor
 import public Stage1.LinAlgebra.TernaryClassifier
+import public Stage1.Carrier.ChromogeometricMetric
 
 %default total
 
@@ -60,6 +61,77 @@ geometrySquareDeterminant geom = detMetric (squareMaxelToMaxel (geometrySquareMe
 public export
 geometrySquareTrace : FundamentalGeometry -> Stage0.BoxInt.BoxInt
 geometrySquareTrace geom = traceMetric (squareMaxelToMaxel (geometrySquareMetric geom))
+
+||| Dynamic 2D metric tensor evaluated at integer lattice coordinates (x, y).
+public export
+geometryMetricDynamic : FundamentalGeometry -> (x, y : BoxInt) -> Maxel
+geometryMetricDynamic EllipticGeom   x y = parameterizedBlueMetricMaxel x y
+geometryMetricDynamic HyperbolicGeom x y = parameterizedRedMetricMaxel x y
+geometryMetricDynamic ParabolicGeom  x y = parameterizedGreenMetricMaxel x y
+geometryMetricDynamic SubstrateGeom  x y = parameterizedSubstrateMetricMaxel x y
+
+||| Dynamic 2x2 SquareMaxel metric tensor evaluated at integer lattice coordinates (x, y).
+public export
+geometrySquareMetricDynamic : FundamentalGeometry -> (x, y : BoxInt) -> SquareMaxel 2
+geometrySquareMetricDynamic EllipticGeom   x y = parameterizedBlueSquareMaxel x y
+geometrySquareMetricDynamic HyperbolicGeom x y = parameterizedRedSquareMaxel x y
+geometrySquareMetricDynamic ParabolicGeom  x y = parameterizedGreenSquareMaxel x y
+geometrySquareMetricDynamic SubstrateGeom  x y = parameterizedSubstrateSquareMaxel x y
+
+||| Evaluates dynamic algebraic Quadrance Q_g(v) of a 2D Vexel under dynamic coordinates (x, y):
+||| Q_g(v) = v1^2 * g11 + 2 * v1 * v2 * g12 + v2^2 * g22.
+public export
+evaluateQuadranceDynamic : FundamentalGeometry -> (x, y : BoxInt) -> (v1, v2 : BoxInt) -> BoxInt
+evaluateQuadranceDynamic geom x y v1 v2 =
+  let g = geometryMetricDynamic geom x y
+      g11Val = lookupCellMultiset (mkPixel 1 1) g
+      g12Val = lookupCellMultiset (mkPixel 1 2) g
+      g22Val = lookupCellMultiset (mkPixel 2 2) g
+      term1 = (v1 * v1) * g11Val
+      term2 = (intToBoxInt 2 * (v1 * v2)) * g12Val
+      term3 = (v2 * v2) * g22Val
+  in term1 + term2 + term3
+
+------------------------------------------------------------------------
+-- 2b. THE 4-GEOMETRY QUAD-METRIC BUNDLE
+------------------------------------------------------------------------
+
+||| First-class dependent record bundling the 4 fundamental geometry metric tensors
+||| at coordinates (x, y) with their constructive linear completion and causal arrow witnesses.
+public export
+record QuadMetricBundle where
+  constructor MkQuadMetricBundle
+  coordX      : BoxInt
+  coordY      : BoxInt
+  blueMaxel   : SquareMaxel 2
+  redMaxel    : SquareMaxel 2
+  greenMaxel  : SquareMaxel 2
+  subMaxel    : SquareMaxel 2
+  isCompleted : Bool
+  isCausal    : Bool
+
+||| Constructs the canonical QuadMetricBundle at coordinate point (x, y).
+public export
+mkQuadMetricBundle : (x, y : BoxInt) -> QuadMetricBundle
+mkQuadMetricBundle x y =
+  let b = parameterizedBlueSquareMaxel x y
+      r = parameterizedRedSquareMaxel x y
+      g = parameterizedGreenSquareMaxel x y
+      s = parameterizedSubstrateSquareMaxel x y
+      compl = auditParameterizedSubstrateOperatorIdentity x y
+      causal = auditSubstrateCausalArrowZeroFeedback x y
+  in MkQuadMetricBundle x y b r g s compl causal
+
+||| Audits dynamic quad-metric bundle completion at non-trivial coordinates.
+public export
+auditDynamicQuadMetricBundleProof : Bool
+auditDynamicQuadMetricBundleProof =
+  let b1 = mkQuadMetricBundle (intToBoxInt 1) (intToBoxInt 1)
+      b43 = mkQuadMetricBundle (intToBoxInt 4) (intToBoxInt 3)
+      b15 = mkQuadMetricBundle (intToBoxInt 15) (intToBoxInt 10)
+  in b1.isCompleted && b1.isCausal &&
+     b43.isCompleted && b43.isCausal &&
+     b15.isCompleted && b15.isCausal
 
 ||| Evaluates the algebraic Quadrance Q_g(v) of a 2D Vexel under a fundamental geometry:
 ||| Q_g(v) = v1^2 * g11 + 2 * v1 * v2 * g12 + v2^2 * g22.
