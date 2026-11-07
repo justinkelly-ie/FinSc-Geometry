@@ -111,7 +111,7 @@ fanoIncidenceMaxel =
       step : BoxMultisetTree Pixel -> (FanoPoint, Nat, FanoLine) -> BoxMultisetTree Pixel
       step acc (p, lIdx, line) =
         if pointOnLine p line
-           then setBoxTree (MkPixel (fanoPointToNat p) lIdx) (intToBoxInt 1) acc
+           then setCellMultiset (MkPixel (fanoPointToNat p) lIdx) (intToBoxInt 1) acc
            else acc
       tree = foldl step BoxLeaf pairs
   in MkSquareMaxel tree

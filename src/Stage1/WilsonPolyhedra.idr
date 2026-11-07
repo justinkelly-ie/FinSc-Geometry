@@ -117,7 +117,6 @@ phaseColorT3 =
                     ]
 
 ||| Applies a 3x3 color operator to a 3-Color state vector.
-%inline
 public export
 applyColorOperator : QuantumOperator -> ColorState -> ColorState
 applyColorOperator op (MkColorState r g b) =
@@ -160,7 +159,6 @@ Show WilsonPolyhedron where
     ", U=" ++ show u ++ ", D=" ++ show d ++ ")"
 
 ||| Creates a flat / trivial Wilson Polyhedron (identity on all 6 faces).
-%inline
 public export
 flatWilsonPolyhedron3 : WilsonPolyhedron
 flatWilsonPolyhedron3 =
@@ -170,7 +168,6 @@ flatWilsonPolyhedron3 =
 
 ||| Evaluates the closed 3D Wilson Polyhedron Cubic Holonomy:
 ||| W_cube = W_east * W_north * W_up * (W_west)^dagger * (W_south)^dagger * (W_down)^dagger.
-%inline
 public export
 wilsonCubeHolonomy : WilsonPolyhedron -> QuantumOperator
 wilsonCubeHolonomy (MkWilsonPolyhedron e w n s u d) =
@@ -184,7 +181,6 @@ wilsonCubeHolonomy (MkWilsonPolyhedron e w n s u d) =
   in mulQuantumOp 3 neg2 dAdj
 
 ||| Evaluates the Wilson Polyhedron Trace Observable: Tr(W_cube).
-%inline
 public export
 wilsonPolyhedronTrace : WilsonPolyhedron -> DualAmplitude
 wilsonPolyhedronTrace poly =
@@ -194,7 +190,6 @@ wilsonPolyhedronTrace poly =
 ||| Evaluates the 3D Polyhedral Cross-Entropy Flux Deficit:
 ||| Delta W = |3 - Re(Tr(W_cube))|.
 ||| Exactly 0 for flat / monopole-free gauge configurations.
-%inline
 public export
 polyhedralCrossEntropyDeficit : WilsonPolyhedron -> Nat
 polyhedralCrossEntropyDeficit poly =
@@ -208,7 +203,6 @@ polyhedralCrossEntropyDeficit poly =
 
 ||| Performs a local vertex gauge transformation at the voxel center V_c
 ||| and its 6 toroidal face neighbors V_e, V_w, V_n, V_s, V_u, V_d.
-%inline
 public export
 gaugeTransformPolyhedron : (vCenter : QuantumOperator) ->
                           (vEast : QuantumOperator) -> (vWest : QuantumOperator) ->

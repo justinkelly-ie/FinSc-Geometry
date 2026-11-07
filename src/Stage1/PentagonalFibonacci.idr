@@ -20,10 +20,10 @@ import Data.Vect
 public export
 fibonacciCompanionMaxel : SquareMaxel 2
 fibonacciCompanionMaxel =
-  let tree0 = setBoxTree (MkPixel 0 0) (intToBoxInt 1) BoxLeaf
-      tree1 = setBoxTree (MkPixel 0 1) (intToBoxInt 1) tree0
-      tree2 = setBoxTree (MkPixel 1 0) (intToBoxInt 1) tree1
-      tree3 = setBoxTree (MkPixel 1 1) (intToBoxInt 0) tree2
+  let tree0 = setCellMultiset (MkPixel 0 0) (intToBoxInt 1) BoxLeaf
+      tree1 = setCellMultiset (MkPixel 0 1) (intToBoxInt 1) tree0
+      tree2 = setCellMultiset (MkPixel 1 0) (intToBoxInt 1) tree1
+      tree3 = setCellMultiset (MkPixel 1 1) (intToBoxInt 0) tree2
   in MkSquareMaxel tree3
 
 ||| Computes M_Fib^N using repeated matrix multiplication.
@@ -36,7 +36,7 @@ powerFibonacciMaxel (S k) =
 ||| Reads the element weight at pixel coordinate p in a SquareMaxel.
 public export
 lookupSquareMaxel : Pixel -> SquareMaxel dim -> BoxInt
-lookupSquareMaxel p (MkSquareMaxel tree) = lookupBoxTree p tree
+lookupSquareMaxel p (MkSquareMaxel tree) = lookupCellMultiset p tree
 
 ||| Extracts the N-th Fibonacci number F_N from M_Fib^N at pixel (0, 1).
 public export
@@ -66,7 +66,7 @@ public export
 pentagonalPermutationMaxel : SquareMaxel 5
 pentagonalPermutationMaxel =
   let step : BoxMultisetTree Pixel -> (Nat, Nat) -> BoxMultisetTree Pixel
-      step acc (r, c) = setBoxTree (MkPixel r c) (intToBoxInt 1) acc
+      step acc (r, c) = setCellMultiset (MkPixel r c) (intToBoxInt 1) acc
       edges = the (List (Nat, Nat)) [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
       tree = foldl step BoxLeaf edges
   in MkSquareMaxel tree

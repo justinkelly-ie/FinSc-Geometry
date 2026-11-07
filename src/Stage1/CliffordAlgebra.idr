@@ -116,6 +116,16 @@ diracSpinorCurrent (MkMultivector s v b _) =
       jV  = scaleCellMultiset (intToBoxInt 2 * s) v
   in singletonCell (mkUnixel 0) j0 <+> jV
 
+||| Audits Dirac Probability Density Positivity: j_0 = s^2 + B^2 >= 0 for all spinors.
+public export
+auditDiracCurrentPositivityProof : Bool
+auditDiracCurrentPositivityProof =
+  let bivec = singletonCell (mkPixel 1 2) (intToBoxInt 4)
+      psi = MkMultivector (intToBoxInt 3) emptyCellMultiset bivec emptyCellMultiset
+      j = diracSpinorCurrent psi
+      j0 = lookupCellMultiset (mkUnixel 0) j
+  in j0 == intToBoxInt 25 && j0 > intToBoxInt 0
+
 ||| Audits that the discrete Dirac current divergence across closed bounding faces vanishes identically.
 public export
 auditDiracCurrentConservationProof : Bool

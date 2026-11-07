@@ -120,6 +120,26 @@ streamAll27States : FusedStream (TernaryBit, TernaryBit, TernaryBit, MetricTenso
 streamAll27States = unfoldStream stepState27 0
 
 
+||| Audits 27-State Ternary Spacetime Multiverse Closure:
+||| Every one of the 27 ternary matrix permutations evaluates to a valid geometric signature
+||| (SigElliptic, SigHyperbolic, or SigParabolic).
+public export
+auditTernaryClosureProof : Bool
+auditTernaryClosureProof =
+  let checkLoop : Nat -> Bool
+      checkLoop Z = True
+      checkLoop (S fuel) =
+        let k = minus 27 (S fuel)
+        in case stepState27 k of
+             Yield (_, _, _, _, sig) _ =>
+               (case sig of
+                  SigElliptic   => True
+                  SigHyperbolic => True
+                  SigParabolic  => True) && checkLoop fuel
+             Done   => True
+             Skip _ => checkLoop fuel
+  in checkLoop 27
+
 ------------------------------------------------------------------------
 -- 3. NATURAL LINEAR INDEPENDENCE OF METRIC VECTORS (CH. 26)
 ------------------------------------------------------------------------

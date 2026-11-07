@@ -70,8 +70,11 @@ fermiDiracRational drag = MkUnixelFraction (Stage0.BoxInt.intToBoxInt 1) (MkUnix
 public export
 auditGrassmannNilpotencyProof : Bool
 auditGrassmannNilpotencyProof =
-  let (finalState, success) = addFermion Occupied
-  in success == False && finalState == Occupied
+  case addFermion Occupied of
+    (Occupied, False) => case addFermion Vacant of
+                           (Occupied, True) => True
+                           _ => False
+    _ => False
 
 ||| Audits Strict Fermionic Binary Occupancy Bound (n in {0, 1}):
 ||| Proves that sum of occupancies across two independent orthogonal fermion modes cannot exceed 2:

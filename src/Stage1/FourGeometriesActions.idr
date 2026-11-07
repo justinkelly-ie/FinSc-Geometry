@@ -135,7 +135,6 @@ auditDynamicQuadMetricBundleProof =
 
 ||| Evaluates the algebraic Quadrance Q_g(v) of a 2D Vexel under a fundamental geometry:
 ||| Q_g(v) = v1^2 * g11 + 2 * v1 * v2 * g12 + v2^2 * g22.
-%inline
 public export
 evaluateQuadrance : FundamentalGeometry -> (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 evaluateQuadrance geom v1 v2 =
@@ -155,28 +154,24 @@ evaluateQuadrance geom v1 v2 =
 
 ||| 1. Elliptic Action: Confinement & Positive Quadrance.
 ||| For any non-zero spatial displacement (1, 0), Q_Elliptic = +1 (strictly positive).
-%inline
 public export
 ellipticConfinementAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 ellipticConfinementAction v1 v2 = evaluateQuadrance EllipticGeom v1 v2
 
 ||| 2. Hyperbolic Action: Non-Abelian Quantum Phase & Lightcones.
 ||| Admits lightlike null vectors with zero quadrance (e.g. (1, 1) -> 1 - 1 = 0).
-%inline
 public export
 hyperbolicPhaseAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 hyperbolicPhaseAction v1 v2 = evaluateQuadrance HyperbolicGeom v1 v2
 
 ||| 3. Parabolic Action: Degenerate Dissipation Channel.
 ||| Disregards orthogonal direction components (g22 = 0, g12 = 0) allowing remainder drainage.
-%inline
 public export
 parabolicDissipationAction : (v1 : Stage0.BoxInt.BoxInt) -> (v2 : Stage0.BoxInt.BoxInt) -> Stage0.BoxInt.BoxInt
 parabolicDissipationAction v1 v2 = evaluateQuadrance ParabolicGeom v1 v2
 
 ||| 4. Substrate Action: Irreversible Causal Arrow.
 ||| Satisfies g22 = 0 (no temporal feedback) and g12 = 1 (unidirectional matter bias).
-%inline
 public export
 substrateCausalArrowAction : Maxel -> Bool
 substrateCausalArrowAction g =
@@ -197,7 +192,6 @@ substrateCausalArrowActionBit g =
 ||| - Hyperbolic Red Sector    = 128 (2^7 Symplectic Law ROM)
 ||| - Parabolic Green Sector   = 55  (Accumulated Dark Matter Residue, T_10)
 ||| Total Budget = 27 + 128 + 55 = 210 = 2 * 3 * 5 * 7.
-%inline
 public export
 cosmicBudgetByGeometry : FundamentalGeometry -> Nat
 cosmicBudgetByGeometry EllipticGeom   = ellipticLatticeCapacity
@@ -206,7 +200,6 @@ cosmicBudgetByGeometry ParabolicGeom  = darkMatterTriangularResidue
 cosmicBudgetByGeometry SubstrateGeom  = primorial210Budget
 
 ||| Evaluates the exact rational chance proportion of each geometry.
-%inline
 public export
 cosmicChanceByGeometry : FundamentalGeometry -> UnixelFraction
 cosmicChanceByGeometry geom =
@@ -239,7 +232,6 @@ chromogeometricGateFingerprint =
 ||| det(Hyperbolic) = -1
 ||| det(Parabolic)  = 0
 ||| det(Substrate)  = -1 (with asymmetric g22 = 0)
-%inline
 public export
 auditFourGeometriesDeterminantsProof : Bool
 auditFourGeometriesDeterminantsProof =

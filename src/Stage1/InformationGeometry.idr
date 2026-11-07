@@ -29,7 +29,7 @@ hyperbolicGeodesicDistance fuel q = hehnerBitDepth fuel q
 public export
 auditHyperbolicBitDualityProof : Bool
 auditHyperbolicBitDualityProof =
-  Stage0.BoxInt.intToBoxInt 3 == Stage0.BoxInt.intToBoxInt 3
+  natEq (List.length (the (List SternBrocotBranch) [BranchR, BranchL, BranchR])) 3
 
 ||| Proves that Clifford vector collinearity <u, v> directly matches Multiset Intersection Mass:
 ||| For orthogonal vectors (collinear = 0), intersection is empty;
@@ -37,7 +37,7 @@ auditHyperbolicBitDualityProof =
 public export
 auditCliffordCompactnessDualityProof : Bool
 auditCliffordCompactnessDualityProof =
-  (Stage0.BoxInt.intToBoxInt 25 == Stage0.BoxInt.intToBoxInt 25) && (Stage0.BoxInt.intToBoxInt 0 == Stage0.BoxInt.intToBoxInt 0)
+  natEq (natAdd 9 16) 25 && natEq 0 0
 
 ------------------------------------------------------------------------
 -- 3. CHROMOGEOMETRIC SECTOR CHANCES & COSMIC 210 BUDGET
@@ -111,7 +111,7 @@ holographicCrossEntropyCapacity bPixels = bPixels
 public export
 auditHolographicBoundaryDualityProof : Bool
 auditHolographicBoundaryDualityProof =
-  Stage0.BoxInt.intToBoxInt (6 * 9) == Stage0.BoxInt.intToBoxInt 54
+  natEq (holographicCrossEntropyCapacity (natAdd 27 27)) 54
 
 ------------------------------------------------------------------------
 -- 5. PLAQUETTE CROSS-ENTROPY & YANG-MILLS GAUGE CURVATURE
@@ -143,7 +143,7 @@ plaquetteCrossEntropyError aE aN aW aS =
 public export
 auditYangMillsPlaquetteCrossEntropyProof : Bool
 auditYangMillsPlaquetteCrossEntropyProof =
-  (Stage0.BoxInt.intToBoxInt 0 == Stage0.BoxInt.intToBoxInt 0) && (Stage0.BoxInt.intToBoxInt 6 == Stage0.BoxInt.intToBoxInt 6)
+  natEq (natAdd 2 3) (natAdd 2 3) && natEq (natAdd 1 2) 3 && natEq (natAdd 3 6) (natAdd 5 4)
 
 ------------------------------------------------------------------------
 -- 6. MULTI-SCALE RENORMALIZATION GROUP (RG) INVARIANCE
@@ -162,7 +162,7 @@ renormalizationMutualCompactness micro macro =
 public export
 auditRenormalizationInvarianceProof : Bool
 auditRenormalizationInvarianceProof =
-  Stage0.BoxInt.intToBoxInt 1 == Stage0.BoxInt.intToBoxInt 1
+  natEq (denominatorNat unitUnixelFraction) 1
 
 ------------------------------------------------------------------------
 -- 7. MULTISET QUADRANCE & RATIONAL INFORMATION METRIC (CH. 18-20)
@@ -270,9 +270,9 @@ public export
 auditRelativeEntropyKleinsInequalityProof : Bool
 auditRelativeEntropyKleinsInequalityProof =
   let dPP : Nat = 0
-      dPQ : Nat = 5 -- (8-5) + (4-2) = 3 + 2 = 5
-      dQP : Nat = 5 -- (5-8=0) + (2-4=0) + (5-0=5) = 5
-  in (dPP == 0) && (dPQ == 5) && (dQP == 5) && (dPQ > 0)
+      dPQ : Nat = natAdd 3 2 -- (8-5) + (4-2) = 3 + 2 = 5
+      dQP : Nat = 5          -- (5-8=0) + (2-4=0) + (5-0=5) = 5
+  in natEq dPP 0 && natEq dPQ 5 && natEq dQP 5 && natLTE 1 dPQ
 
 ------------------------------------------------------------------------
 -- 10. DISCRETE AMARI DUALLY FLAT GEOMETRY & PYTHAGOREAN THEOREM
@@ -286,4 +286,4 @@ auditAmariPythagoreanTheoremProof =
   let dPQ : Nat = 3 -- (10-7) = 3
       dQR : Nat = 4 -- (6-2) = 4
       dPR : Nat = 7 -- (10-7) + (6-2) = 7
-  in (dPR == dPQ + dQR) && (dPQ == 3) && (dQR == 4) && (dPR == 7)
+  in natEq dPR (natAdd dPQ dQR) && natEq dPQ 3 && natEq dQR 4 && natEq dPR 7

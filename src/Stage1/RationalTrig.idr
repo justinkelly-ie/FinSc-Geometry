@@ -470,6 +470,15 @@ auditSpreadDiagonalRatioProof x y =
       rhs = intToBoxInt 2 * qRed
   in boxEq lhs rhs
 
+||| Static verification witness: Chromogeometric triad quadrance symmetry, spread diagonal ratio, and Archimedes collinearity.
+public export
+auditBoxQuadranceAndSpreadProof : Bool
+auditBoxQuadranceAndSpreadProof =
+  evaluateThreeFoldQuadranceSymmetry (intToBoxInt 4) (intToBoxInt 3) &&
+  auditSpreadDiagonalRatioProof (intToBoxInt 4) (intToBoxInt 3) &&
+  auditBoxPythagorasProof &&
+  auditBoxCollinearitySpreadProof
+
 ||| Constructs the 2x2 Companion Maxel transfer matrix for multiple spread recurrence:
 ||| [[2 - 4s, -1], [1, 0]].
 ||| Deprecated: Prefer exact integer `pythagoreanSpreadMaxel x y` to avoid fractional truncation.
