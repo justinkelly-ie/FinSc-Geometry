@@ -1,6 +1,7 @@
 module Stage1.PentagonalFibonacci
 
 import Stage0.BoxInt
+import Stage0.Token
 import Stage1.Basis.Coordinate
 import Stage1.MultisetTree
 import Stage0.PrimeMultiset
@@ -26,12 +27,12 @@ fibonacciCompanionMaxel =
       tree3 = setCellMultiset (MkPixel 1 1) (intToBoxInt 0) tree2
   in MkSquareMaxel tree3
 
-||| Computes M_Fib^N using repeated matrix multiplication.
+||| Computes M_Fib^N using repeated matrix multiplication via symbolic (*).
 public export
 powerFibonacciMaxel : Nat -> SquareMaxel 2
-powerFibonacciMaxel 0 = identitySquareMaxel 2
+powerFibonacciMaxel 0 = 1
 powerFibonacciMaxel (S k) =
-  mulSquareMaxel fibonacciCompanionMaxel (powerFibonacciMaxel k)
+  fibonacciCompanionMaxel * (powerFibonacciMaxel k)
 
 ||| Reads the element weight at pixel coordinate p in a SquareMaxel.
 public export
@@ -71,12 +72,12 @@ pentagonalPermutationMaxel =
       tree = foldl step BoxLeaf edges
   in MkSquareMaxel tree
 
-||| Computes sigma_5^k cyclic shift matrix.
+||| Computes sigma_5^k cyclic shift matrix via symbolic (*).
 public export
 powerPentagonalMaxel : Nat -> SquareMaxel 5
-powerPentagonalMaxel 0 = identitySquareMaxel 5
+powerPentagonalMaxel 0 = 1
 powerPentagonalMaxel (S k) =
-  mulSquareMaxel pentagonalPermutationMaxel (powerPentagonalMaxel k)
+  pentagonalPermutationMaxel * (powerPentagonalMaxel k)
 
 ------------------------------------------------------------------------
 -- 3. 2LTT STAGED FIBONACCI STEPPING & COMPILED CLOSURE
@@ -123,3 +124,11 @@ auditGoldenRatio13Smooth : Bool
 auditGoldenRatio13Smooth =
   let phi7 = goldenRatioConvergent 7
   in phi7.num == intToBoxInt 21 && phi7.den == MkUnixel 13
+
+public export
+0 prfFibonacciSequenceQTT : Stage1.PentagonalFibonacci.auditFibonacciSequence = True
+prfFibonacciSequenceQTT = Refl
+
+public export
+0 prfGoldenRatio13SmoothQTT : Stage1.PentagonalFibonacci.auditGoldenRatio13Smooth = True
+prfGoldenRatio13SmoothQTT = Refl
