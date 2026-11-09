@@ -1,7 +1,7 @@
 package FinSc-Geometry
 version = 0.3.3
 authors = "Justin Kelly"
-brief   = "Layer 3a Discrete Kinematics & Differential Geometry Subsystem."
+brief   = "Layer 6 Rational Trigonometry, Chromogeometry & Differential Geometry"
 
 depends = base, linear, FinSc-Multiset, FinSc-Metric-Substrate, FinSc-Phase-Unfolding, FinSc-Radix-Ternary, FinSc-Dihedron
 sourcedir = "src"
